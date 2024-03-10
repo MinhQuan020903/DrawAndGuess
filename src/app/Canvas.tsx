@@ -20,10 +20,10 @@ type DrawLineProps = {
   currentPoint: Point;
   color: string;
 };
-
 const room = 1;
 
-const socket = io(`http://192.168.1.12:8086?room=${room}`, {
+console.log(process.env.NEXT_PUBLIC_SOCKET_BASE_URL);
+const socket = io(process.env.NEXT_PUBLIC_SOCKET_BASE_URL + `?room=${room}`, {
   transports: ['websocket', 'polling', 'flashsocket'],
 });
 
