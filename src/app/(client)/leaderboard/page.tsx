@@ -15,7 +15,7 @@ import data from '../../../components/leaderboard/data.json';
 // Initial data is read from data.json
 // Every 5 seconds, a random entry is selected and its values are incremented
 
-function App() {
+function Page() {
   const [currentData, setCurrentData] = useState(data);
   const timer = 5000;
 
@@ -99,4 +99,4 @@ function App() {
   );
 }
 
-export default App;
+export default Page;

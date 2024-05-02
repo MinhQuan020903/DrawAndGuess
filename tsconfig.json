@@ -27,7 +27,8 @@
       "@actions/*": ["./src/actions/*"],
       "@services/*": ["./src/services/*"],
       "@endpoints/*": ["./src/endpoints/*"],
-      "@types/*": ["./src/types/*"]
+      "@types/*": ["./src/types/*"],
+      "@utils/*": ["./src/utils/*"]
     },
     "strictNullChecks": true
   },
