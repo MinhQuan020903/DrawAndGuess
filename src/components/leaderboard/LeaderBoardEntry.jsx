@@ -1,7 +1,8 @@
-import { Flex, Center, Text, Avatar, ScaleFade } from '@chakra-ui/react';
+import { Flex, Center, Text, Avatar, ScaleFade, Icon } from '@chakra-ui/react';
 import { motion } from 'framer-motion';
 import { memo, useEffect, useState } from 'react';
 import CountUp from 'react-countup';
+import { FaPencilAlt } from 'react-icons/fa';
 
 const delay = (ms) => new Promise((res) => setTimeout(res, ms));
 
@@ -12,7 +13,7 @@ const LeaderBoardEntry = ({ row }) => {
   useEffect(() => {
     async function setRows() {
       // If there has been a change in dollarVolume
-      if (oldRow && oldRow.dollarVolumeLifetime !== row.dollarVolumeLifetime) {
+      if (oldRow && oldRow.points !== row.points) {
         setNewRow(row);
         await delay(2100);
         setOldRow(row);
@@ -31,10 +32,7 @@ const LeaderBoardEntry = ({ row }) => {
       {oldRow && newRow && (
         <motion.div
           animate={{
-            scale:
-              newRow.dollarVolumeLifetime == oldRow.dollarVolumeLifetime
-                ? '1'
-                : '1.03',
+            scale: newRow.points == oldRow.points ? '1' : '1.03',
           }}
         >
           <Flex
@@ -46,17 +44,20 @@ const LeaderBoardEntry = ({ row }) => {
             flexGrow={1}
             borderRadius="lg"
             w="200px"
+            backgroundColor={'white'}
             borderLeft="2px"
             borderColor={
-              newRow.dollarVolumeLifetime == oldRow.dollarVolumeLifetime
-                ? 'teal.100'
-                : 'teal.400'
+              newRow.points == oldRow.points ? 'teal.100' : 'teal.400'
             }
-            h="40px"
+            h="60px"
             justify={'space-between'}
           >
             <Flex flexGrow={1} flexDir="row">
               <Center>
+                <div size="sm" className="w-4 justify-center align-middle">
+                  {row.currentTurn && <Icon as={FaPencilAlt} color={'blue'} />}
+                </div>
+
                 <Avatar
                   key={`${row.LO.Name}-avatar`}
                   mr={2}
@@ -66,9 +67,7 @@ const LeaderBoardEntry = ({ row }) => {
                 <Flex key={row.LO.Name} flexDir={'column'}>
                   <Text
                     fontWeight={
-                      newRow.dollarVolumeLifetime == oldRow.dollarVolumeLifetime
-                        ? 'normal'
-                        : 'semibold'
+                      newRow.points == oldRow.points ? 'normal' : 'semibold'
                     }
                     fontSize="sm"
                   >
@@ -76,33 +75,33 @@ const LeaderBoardEntry = ({ row }) => {
                   </Text>
                   <Text
                     as="em"
-                    color={'gray.600'}
+                    color={'blue.600'}
                     fontSize="xs"
                     fontWeight={
-                      newRow.dollarVolumeLifetime == oldRow.dollarVolumeLifetime
-                        ? 'normal'
-                        : 'extrabold'
+                      newRow.points == oldRow.points ? 'normal' : 'extrabold'
                     }
                   >
                     <CountUp
-                      prefix="$"
+                      suffix=" pts"
                       separator=","
                       duration={2}
-                      start={oldRow.dollarVolumeLifetime}
-                      end={newRow.dollarVolumeLifetime}
+                      start={oldRow.points}
+                      end={newRow.points}
                     />
+                  </Text>
+                  <Text
+                    as="em"
+                    color={'blue'}
+                    fontSize="xs"
+                    fontWeight={
+                      newRow.points == oldRow.points ? 'normal' : 'extrabold'
+                    }
+                  >
+                    {row.nextTurn ? 'Next to draw' : ''}
                   </Text>
                 </Flex>
               </Center>
             </Flex>
-            <Text fontWeight={'semibold'} fontSize="xl">
-              <CountUp
-                separator=","
-                duration={2}
-                start={oldRow.noFundedLifetime}
-                end={newRow.noFundedLifetime}
-              />
-            </Text>
           </Flex>
         </motion.div>
       )}

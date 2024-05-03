@@ -1,146 +1,68 @@
 [
-    {
-        "noFundedMTD": 3,
-        "dollarVolumeMTD": 859662,
-        "dollarVolumeYTD": 1524122,
-
-        "noFundedYTD": 5,
-        "dollarVolumeLifetime": 36405866,
-        "LO": {
-            "Name": "Lee"
-        },
-        "noFundedLifetime": 121
-    },
-    {
-        "noFundedMTD": 2,
-        "dollarVolumeLifetime": 14740309,
-        "noFundedLifetime": 52,
-        "dollarVolumeYTD": 1888515,
-        "noFundedYTD": 5,
-        "dollarVolumeMTD": 639935,
-
-        "LO": {
-            "Name": "Sean"
-        }
-    },
-    {
-        "noFundedMTD": 3,
-        "dollarVolumeMTD": 544113,
-        "dollarVolumeLifetime": 6577718,
-        "noFundedLifetime": 31,
-        "dollarVolumeYTD": 1036912,
-        "LO": {
-            "Name": "Brittany"
-        },
-        "noFundedYTD": 5
-
-    },
-    {
-        "dollarVolumeMTD": 160000,
-        "noFundedLifetime": 62,
-        "noFundedYTD": 4,
-
-        "dollarVolumeYTD": 1539025,
-        "noFundedMTD": 1,
-        "dollarVolumeLifetime": 22027490,
-        "LO": {
-            "Name": "Alex"
-        }
-    },
-    {
-        "dollarVolumeMTD": 1198080,
-        "dollarVolumeLifetime": 8253985,
-        "LO": {
-            "Name": "Pax"
-        },
-        "noFundedYTD": 4,
-        "noFundedMTD": 3,
-        "noFundedLifetime": 29,
-
-        "dollarVolumeYTD": 1378080
-    },
-    {
-        "dollarVolumeLifetime": 4142508,
-        "dollarVolumeMTD": 583529,
-        "noFundedLifetime": 17,
-        "dollarVolumeYTD": 843729,
-        "noFundedYTD": 4,
-        "LO": {
-            "Name": "Tyler"
-        },
-        "noFundedMTD": 3
-
-    },
-    {
-        "noFundedYTD": 3,
-        "dollarVolumeYTD": 883727,
-        "noFundedMTD": 2,
-        "dollarVolumeMTD": 636377,
-        "LO": {
-            "Name": "Mel"
-        },
-
-        "dollarVolumeLifetime": 81076773,
-        "noFundedLifetime": 289
-    },
-    {
-        "noFundedLifetime": 194,
-        "dollarVolumeYTD": 827635,
-        "noFundedYTD": 3,
-
-        "noFundedMTD": 3,
-        "dollarVolumeMTD": 827635,
-        "dollarVolumeLifetime": 51783436,
-        "LO": {
-            "Name": "Ben "
-        }
-    },
-    {
-        "noFundedMTD": 1,
-        "dollarVolumeYTD": 652881,
-        "noFundedYTD": 2,
-
-        "LO": {
-            "Name": "Trevor"
-        },
-        "dollarVolumeMTD": 269256,
-        "noFundedLifetime": 8,
-        "dollarVolumeLifetime": 3082212
-    },
-    {
-        "noFundedYTD": 2,
-        "noFundedMTD": 2,
-        "LO": {
-            "Name": "Pascual"
-        },
-        "dollarVolumeLifetime": 784089,
-        "dollarVolumeMTD": 784089,
-
-        "dollarVolumeYTD": 784089,
-        "noFundedLifetime": 2
-    },
-    {
-        "dollarVolumeLifetime": 26072768,
-        "LO": {
-            "Name": "Elouise"
-        },
-
-        "noFundedLifetime": 93,
-        "dollarVolumeMTD": 220000,
-        "noFundedYTD": 1,
-        "noFundedMTD": 1,
-        "dollarVolumeYTD": 220000
-    },
-    {
-
-        "LO": {
-            "Name": "Tim"
-        },
-        "noFundedLifetime": 169,
-        "dollarVolumeMTD": 0,
-        "dollarVolumeYTD": 350276,
-        "dollarVolumeLifetime": 45688931,
-        "noFundedMTD": 0,
-        "noFundedYTD": 1
+  {
+    "currentTurn": true,
+    "nextTurn": false,
+    "points": 10,
+    "LO": {
+      "Name": "Lee"
     }
+  },
+  {
+    "currentTurn": false,
+    "nextTurn": true,
+    "points": 50,
+    "LO": {
+      "Name": "Sean"
+    }
+  },
+  {
+    "currentTurn": false,
+    "nextTurn": false,
+    "LO": {
+      "Name": "Pascual"
+    },
+    "points": 34
+  },
+  {
+    "currentTurn": false,
+    "nextTurn": false,
+    "points": 49,
+    "LO": {
+      "Name": "Brittany"
+    }
+  },
+  {
+    "currentTurn": false,
+    "nextTurn": false,
+    "points": 30,
+    "LO": {
+      "Name": "Alex"
+    }
+  },
+  {
+    "currentTurn": false,
+    "nextTurn": false,
+    "points": 25,
+    "LO": {
+      "Name": "Pax"
+    }
+  },
+  {
+    "currentTurn": false,
+    "nextTurn": false,
+    "points": 11,
+
+    "LO": {
+      "Name": "Tyler"
+    }
+  },
+  {
+    "currentTurn": false,
+    "nextTurn": false,
+    "LO": {
+      "Name": "Tim"
+    },
+
+    "points": 54
+  }
 ]
