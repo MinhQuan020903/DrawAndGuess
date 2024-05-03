@@ -70,6 +70,7 @@ const LeaderBoardEntry = ({ row }) => {
                       newRow.points == oldRow.points ? 'normal' : 'semibold'
                     }
                     fontSize="sm"
+                    color={'black'}
                   >
                     {row.LO.Name}
                   </Text>

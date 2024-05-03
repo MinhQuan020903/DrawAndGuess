@@ -1,6 +1,23 @@
-"use client";
-import { useRef, useEffect, MouseEvent, useState } from "react";
+'use client';
+import { useRef, useEffect, MouseEvent, useState } from 'react';
+import {
+  ColorPicker,
+  Hue,
+  IColor,
+  Saturation,
+  useColor,
+} from 'react-color-palette';
 
+import { useDraw } from '@/hooks/useDraw';
+
+import { io } from 'socket.io-client';
+import { drawLine } from '../utils/drawLine';
+
+const room = 1;
+
+const socket = io(process.env.NEXT_PUBLIC_SOCKET_BASE_URL + `?room=${room}`, {
+  transports: ['websocket', 'polling', 'flashsocket'],
+});
 interface CanvasProps {
   className: string;
   width: number;
@@ -11,9 +28,8 @@ interface CanvasProps {
   fillMode: boolean;
   setClear: (params: any) => any;
 }
-
 const CustomCanvas = (props: CanvasProps) => {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
+  // const canvasRef = useRef<HTMLCanvasElement>(null);
   const [mouseDown, setmouseDown] = useState(false);
   const [lastMouseX, setLastMouseX] = useState(0);
   const [lastMouseY, setLastMouseY] = useState(0);
@@ -28,7 +44,7 @@ const CustomCanvas = (props: CanvasProps) => {
     //console.log("clear");
     if (canvasRef.current && props.clear) {
       const canvas = canvasRef.current;
-      const context = canvas.getContext("2d")!;
+      const context = canvas.getContext('2d')!;
       context.clearRect(0, 0, canvas.width, canvas.height);
       console.log(canvas.toDataURL());
       props.setClear(false);
@@ -44,7 +60,7 @@ const CustomCanvas = (props: CanvasProps) => {
     var a = x - x2;
     var b = y - y2;
     var c = Math.hypot(a, b);
-    var interpolation=(20/props.brushSize)*40
+    var interpolation = (20 / props.brushSize) * 40;
     if (c > 10) {
       for (var i = 1; i <= interpolation; i++) {
         context.fillStyle = props.color;
@@ -60,10 +76,12 @@ const CustomCanvas = (props: CanvasProps) => {
       }
     }
   }
+  const { canvasRef, onMouseDown, clear } = useDraw(createLine);
+  const [color, setColor] = useColor(props.color);
   function draw(e: MouseEvent) {
     if (canvasRef.current && mouseDown && !props.fillMode) {
       const canvas = canvasRef.current;
-      const context = canvas.getContext("2d")!;
+      const context = canvas.getContext('2d')!;
       var pos = getMousePos(canvas, e);
       var posx = pos.x;
       var posy = pos.y;
@@ -105,27 +123,27 @@ const CustomCanvas = (props: CanvasProps) => {
   function fill(e: MouseEvent) {
     if (canvasRef.current && props.fillMode) {
       const canvas = canvasRef.current;
-      const context = canvas.getContext("2d")!;
+      const context = canvas.getContext('2d')!;
       const pos = getMousePos(canvas, e);
       const x = Math.floor(pos.x);
       const y = Math.floor(pos.y);
       const imgd = context.getImageData(0, 0, canvas.width, canvas.height);
       const pix = imgd.data;
-  
+
       const initialPixel = getPixel(pix, y * imgd.width + x);
       const filledPixels = new Set<string>();
-  
+
       const stack = [[x, y]]; // Push the seed
       const fillColor = props.color;
-  
+
       context.fillStyle = fillColor;
-  
+
       while (stack.length > 0) {
         const currPos = stack.shift()!;
-        var currX=currPos[0];
-        var currY=currPos[1];
+        var currX = currPos[0];
+        var currY = currPos[1];
         const pixelKey = `${currX},${currY}`;
-  
+
         if (
           currX >= 0 &&
           currX < canvas.width &&
@@ -136,7 +154,7 @@ const CustomCanvas = (props: CanvasProps) => {
         ) {
           context.fillRect(currX, currY, 1, 1); // Fill the point with the foreground
           filledPixels.add(pixelKey);
-  
+
           stack.push([currX + 1, currY]); // Fill the east neighbour
           stack.push([currX, currY + 1]); // Fill the south neighbour
           stack.push([currX - 1, currY]); // Fill the west neighbour
@@ -145,12 +163,67 @@ const CustomCanvas = (props: CanvasProps) => {
       }
     }
   }
+
+  useEffect(() => {
+    const ctx = canvasRef.current?.getContext('2d');
+    console.log(socket);
+    socket.emit('client-ready');
+
+    socket.on('get-canvas-state', () => {
+      console.log('I received the request');
+      if (!canvasRef.current?.toDataURL()) return;
+      console.log('sending canvas state');
+      socket.emit('canvas-state', {
+        canvasState: canvasRef.current.toDataURL(),
+      });
+    });
+
+    socket.on('canvas-state-from-server', (data: { canvasState: string }) => {
+      console.log('I received the state');
+      const img = new Image();
+      img.src = data.canvasState;
+      img.onload = () => {
+        ctx?.drawImage(img, 0, 0);
+      };
+    });
+
+    socket.on(
+      'draw-line',
+      (line: { prevPoint: Point; currentPoint: Point; color: IColor }) => {
+        if (!ctx) return console.log('no ctx here');
+
+        drawLine({ ...line, ctx });
+      }
+    );
+
+    socket.on('clear', clear);
+
+    return () => {
+      socket.off('draw-line');
+      socket.off('get-canvas-state');
+      socket.off('canvas-state-from-server');
+      socket.off('clear');
+    };
+  }, [canvasRef]);
+
+  function createLine({ prevPoint, currentPoint, ctx }: Draw) {
+    socket.emit('draw-line', { prevPoint, currentPoint, color });
+    drawLine({ prevPoint, currentPoint, ctx, color });
+  }
+
   return (
     <canvas
-      onContextMenu={(event: MouseEvent)=>event.preventDefault()}
-      onClick={(event: MouseEvent) => {fill(event)}}
+      ref={canvasRef}
+      // onMouseDown={}
+      onContextMenu={(event: MouseEvent) => event.preventDefault()}
+      onClick={(event: MouseEvent) => {
+        fill(event);
+      }}
       onMouseDown={(event: MouseEvent) => {
-        if(event.button==0) setmouseDown(true);
+        if (event.button == 0) {
+          setmouseDown(true);
+        }
+        onMouseDown;
       }}
       onMouseLeave={() => {
         setmouseDown(false);
@@ -164,7 +237,6 @@ const CustomCanvas = (props: CanvasProps) => {
       }}
       onMouseMove={draw}
       className={props.className}
-      ref={canvasRef}
       height={props.height}
       width={props.width}
     />
