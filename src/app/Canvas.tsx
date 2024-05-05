@@ -13,36 +13,53 @@ import {
   useColor,
 } from 'react-color-palette';
 
-interface pageProps {}
-
-type DrawLineProps = {
-  prevPoint: Point | null;
-  currentPoint: Point;
-  color: string;
-};
-const room = 1;
-
-console.log(process.env.NEXT_PUBLIC_SOCKET_BASE_URL);
-const socket = io(process.env.NEXT_PUBLIC_SOCKET_BASE_URL + `?room=${room}`, {
-  transports: ['websocket', 'polling', 'flashsocket'],
+const socket = io(process.env.NEXT_PUBLIC_SOCKET_BASE_URL + '/draw', {
+  transports: ['websocket'],
+  upgrade: true,
+  reconnection: true,
+  // transportOptions: {
+  //   polling: {
+  //     extraHeaders: {
+  //       Authorization:
+  //         'Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0cmFuX3Zhbl9hIiwiaWF0IjoxNzE0ODk1OTM4LCJleHAiOjE3MTQ5ODIzMzh9.X_UBMFksH0JyKO47-gMKqruLrGiPTH4_axVxl57DoAk', // Thay bằng token thật
+  //     },
+  //   },
+  // },
 });
 
 export const Canvas = ({}) => {
   const [color, setColor] = useColor('#561ecb');
 
+  //For testing, randomize the user id
+  //If want to change the user id, just F5 refresh the page
+  //1 is the player, 0 is the guest
+  const [id, setId] = useState(Math.round(Math.random()));
+  const [isPlayer, setIsPlayer] = useState(false);
   const { canvasRef, onMouseDown, clear } = useDraw(createLine);
 
   useEffect(() => {
     const ctx = canvasRef.current?.getContext('2d');
     console.log(socket);
+    console.log(id);
+    //Fake user id (1 is the player, 2 is the guest)
+    //Scenarios:
+    //1. User with id 1 joins the room => User 1 is the player
+    //2. User with id 0 joins the room => User 0 is the guest
+
     socket.emit('client-ready');
 
-    socket.on('get-canvas-state', () => {
-      console.log('I received the request');
-      if (!canvasRef.current?.toDataURL()) return;
-      console.log('sending canvas state');
+    socket.on('request-canvas-state', (data) => {
+      console.log('🚀 ~ socket.on ~ data:', data);
+      if (data.userId == id) {
+        setIsPlayer(true);
+        console.log('I am the player');
+        console.log('sending canvas state');
+      } else {
+        console.log('I am the guest');
+        console.log('requesting canvas state');
+      }
       socket.emit('canvas-state', {
-        canvasState: canvasRef.current.toDataURL(),
+        canvasState: canvasRef!.current!.toDataURL(),
       });
     });
 
@@ -75,8 +92,10 @@ export const Canvas = ({}) => {
   }, [canvasRef]);
 
   function createLine({ prevPoint, currentPoint, ctx }: Draw) {
-    socket.emit('draw-line', { prevPoint, currentPoint, color });
-    drawLine({ prevPoint, currentPoint, ctx, color });
+    if (isPlayer) {
+      socket.emit('draw-line', { prevPoint, currentPoint, color });
+      drawLine({ prevPoint, currentPoint, ctx, color });
+    }
   }
 
   return (
