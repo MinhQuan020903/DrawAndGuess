@@ -37,14 +37,14 @@ export function isArrayOfFile(files: unknown): files is File[] {
   if (!isArray) return false;
   return files.every((file) => file instanceof File);
 }
-export const parseJSON = (str: string, out = []) => {
-  try {
-    const val = JSON.parse(str);
-    return val ?? out;
-  } catch (error) {
-    return out;
-  }
-};
+// export const parseJSON = (str: string, out = []) => {
+//   try {
+//     const val = JSON.parse(str);
+//     return val ?? out;
+//   } catch (error) {
+//     return out;
+//   }
+// };
 
 export const verifyJwt = (token: string) => {
   console.log(process.env.NEXT_PUBLIC_JWT_SECRET);

@@ -1,7 +1,7 @@
 'use client';
 
 import * as React from 'react';
-
+import { Flex, Center, Text, Avatar, ScaleFade, Icon } from '@chakra-ui/react';
 import { cn } from '@/lib/utils';
 import { Icons } from '@/assets/Icons';
 import { Button } from '@/components/ui/button';
@@ -25,8 +25,8 @@ import * as z from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 
 const formSchema = z.object({
-  email: z.string().min(1, {
-    message: 'Email is required',
+  username: z.string().min(1, {
+    message: 'username is required',
   }),
   password: z.string().min(1, {
     message: 'Password is required',
@@ -42,7 +42,7 @@ const Login = ({ className }: { className?: string; providers: unknown }) => {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      email: '',
+      username: '',
       password: '',
     },
   });
@@ -51,7 +51,7 @@ const Login = ({ className }: { className?: string; providers: unknown }) => {
 
     setIsLoading(true);
     const res = await signIn('credentials', {
-      email: data.email,
+      username: data.username,
       password: data.password,
       redirect: false,
     });
@@ -76,7 +76,41 @@ const Login = ({ className }: { className?: string; providers: unknown }) => {
     );
   return (
     <div className="flex flex-row grow  gap-4">
-      <div className="h-[100%] w-[100%] lg:w-1/2 overflow-auto">Left</div>
+      {/* Left */}
+      {/* <div className="h-[100%] w-[100%] lg:w-1/2 overflow-auto">
+        <div className="w-full flex flex-col items-center justify-center">
+          <div
+            className={cn(
+              'grid gap-6 w-[80%] md:w-[70%] lg:w-[60%] ',
+              className
+            )}
+          >
+            <div className="w-full justify-center align-middle">
+              <Avatar
+                key={`Lee-avatar`}
+                mr={2}
+                src={`https://api.dicebear.com/5.x/big-smile/svg?seed=Lee`}
+                size="lg"
+              ></Avatar>
+            </div>
+            <div className="flex flex-row gap-2">
+              <span className="basis-1/4">Username: </span>
+              <input
+                className=" basis-3/4 p-2 text-black rounded-md "
+                placeholder="boby"
+              ></input>
+            </div>
+            <div className="flex flex-row gap-2">
+              <span className="basis-1/4">Game Code: </span>
+              <input
+                className="p-2 text-black rounded-md basis-3/4"
+                placeholder="SJKHNQ"
+              ></input>
+            </div>
+            <Button onClick={() => router.push('game/1')}>Join Game</Button>
+          </div>
+        </div>
+      </div> */}
       <div className="h-[100%] w-[100%] lg:w-1/2 overflow-auto">
         <div className="w-full flex flex-col items-center justify-center">
           <div
@@ -90,10 +124,10 @@ const Login = ({ className }: { className?: string; providers: unknown }) => {
                 <div className="grid gap-6">
                   <div className="gap-8 flex flex-col">
                     <div className="flex flex-col gap-3 ">
-                      <Label>Tài khoản</Label>
+                      <Label className=" self-start">Tài khoản</Label>
                       <FormField
                         control={form.control}
-                        name="email"
+                        name="username"
                         render={({ field }) => (
                           <FormItem>
                             <FormControl>
@@ -108,7 +142,7 @@ const Login = ({ className }: { className?: string; providers: unknown }) => {
                       />
                     </div>
                     <div className="flex flex-col gap-3 ">
-                      <Label>Mật khẩu</Label>
+                      <Label className=" self-start">Mật khẩu</Label>
                       <FormField
                         control={form.control}
                         name="password"
@@ -169,7 +203,7 @@ const Login = ({ className }: { className?: string; providers: unknown }) => {
               <Button
                 className="w-1/2 "
                 onClick={() => {
-                  signIn('github');
+                  // signIn('github');
                 }}
                 variant="outline"
                 disabled={isLoading}
@@ -182,7 +216,7 @@ const Login = ({ className }: { className?: string; providers: unknown }) => {
               <Button
                 className="w-1/2"
                 onClick={() => {
-                  signIn('discord');
+                  // signIn('discord');
                 }}
                 variant="outline"
                 disabled={isLoading}
@@ -195,7 +229,7 @@ const Login = ({ className }: { className?: string; providers: unknown }) => {
               <Button
                 className="w-1/2"
                 onClick={() => {
-                  signIn('google');
+                  // signIn('google');
                 }}
                 variant="outline"
                 disabled={isLoading}
@@ -208,7 +242,7 @@ const Login = ({ className }: { className?: string; providers: unknown }) => {
             </div>
           </div>
 
-          <p className="mt-10 px-8 text-center text-sm text-muted-foreground">
+          <p className="mt-5 px-8 text-center text-sm text-muted-foreground">
             Chưa có tài khoản?{' '}
             <Link
               className="font-bold underline text-black"
@@ -217,6 +251,7 @@ const Login = ({ className }: { className?: string; providers: unknown }) => {
               Đăng ký
             </Link>
           </p>
+          <div className="h-10"></div>
         </div>
       </div>
     </div>
