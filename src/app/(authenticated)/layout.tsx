@@ -1,4 +1,4 @@
-import { mustBeLoggedIn } from '@/lib/auth';
+import { getSession, mustBeLoggedIn } from '@/lib/auth';
 
 export default async function DashboardLayout({
   children,
@@ -6,6 +6,8 @@ export default async function DashboardLayout({
   children: React.ReactNode;
 }) {
   await mustBeLoggedIn();
+  const session = await getSession();
+  console.log('🚀 ~ session:', session);
 
   return (
     <div className="">

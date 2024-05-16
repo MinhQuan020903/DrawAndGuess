@@ -369,8 +369,8 @@ const options: AuthOptions = {
   },
   callbacks: {
     async jwt({ token, user }) {
-      console.log('🚀 ~ file: options.ts:154 ~ jwt ~ user:', user);
-      console.log('🚀 ~ file: options.ts:154 ~ jwt ~ token:', token);
+      // console.log('🚀 ~ file: options.ts:154 ~ jwt ~ user:', user);
+      // console.log('🚀 ~ file: options.ts:154 ~ jwt ~ token:', token);
       if (user) {
         token.role = user.role;
         token.id = user.id;
@@ -393,7 +393,8 @@ const options: AuthOptions = {
       console.log('token in sessionnnnnnnnnnnnnnnnn: ', token);
       if (session.user) {
         (session.user as { id: string }).id = token.id as string;
-        (session.user as { username: string }).username = token.name as string;
+        (session.user as { username: string }).username =
+          token.username as string;
         (session.user as { role: string }).role = token.role as string;
         (session.user as { display_name: string }).display_name =
           token.display_name as string;

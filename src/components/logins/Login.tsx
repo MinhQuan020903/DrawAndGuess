@@ -67,6 +67,7 @@ const Login = ({ className }: { className?: string; providers: unknown }) => {
     if (!res?.error) router.refresh();
     setIsLoading(false);
     console.log(res);
+    router.push('/user');
   }
   if (isLoading)
     return (
@@ -111,7 +112,7 @@ const Login = ({ className }: { className?: string; providers: unknown }) => {
           </div>
         </div>
       </div> */}
-      <div className="h-[100%] w-[100%] lg:w-1/2 overflow-auto">
+      <div className="h-[100%] w-[100%]  overflow-auto">
         <div className="w-full flex flex-col items-center justify-center">
           <div
             className={cn(
@@ -242,10 +243,10 @@ const Login = ({ className }: { className?: string; providers: unknown }) => {
             </div>
           </div>
 
-          <p className="mt-5 px-8 text-center text-sm text-muted-foreground">
+          <p className="mt-5 px-8 text-center text-sm text-white">
             Chưa có tài khoản?{' '}
             <Link
-              className="font-bold underline text-black"
+              className="font-bold underline text-white"
               href="/auth/register"
             >
               Đăng ký
