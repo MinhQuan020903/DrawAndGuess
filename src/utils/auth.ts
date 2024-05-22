@@ -15,7 +15,10 @@ export default async function apiAuthSignIn(
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ username: 'ninh123', password: '123456' }),
+        body: JSON.stringify({
+          username: credentials?.username,
+          password: credentials?.password,
+        }),
       }
     );
 
