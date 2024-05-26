@@ -12,12 +12,8 @@ import { useDraw } from '@/hooks/useDraw';
 
 import { io } from 'socket.io-client';
 import { drawLine } from '../utils/drawLine';
+import { useRouter } from 'next/router';
 
-const room = 1;
-
-const socket = io(process.env.NEXT_PUBLIC_SOCKET_BASE_URL + `?room=${room}`, {
-  transports: ['websocket', 'polling', 'flashsocket'],
-});
 interface CanvasProps {
   className: string;
   width: number;
@@ -27,12 +23,17 @@ interface CanvasProps {
   brushSize: number;
   fillMode: boolean;
   setClear: (params: any) => any;
+  session: any;
+  roomId: string;
 }
 const CustomCanvas = (props: CanvasProps) => {
+  console.log('props', props);
+
   // const canvasRef = useRef<HTMLCanvasElement>(null);
   const [mouseDown, setmouseDown] = useState(false);
   const [lastMouseX, setLastMouseX] = useState(0);
   const [lastMouseY, setLastMouseY] = useState(0);
+  const [socket, setSocket] = useState<any>(null);
   function getMousePos(canvas: HTMLCanvasElement, evt: MouseEvent) {
     var rect = canvas.getBoundingClientRect();
     return {
@@ -165,9 +166,28 @@ const CustomCanvas = (props: CanvasProps) => {
   }
 
   useEffect(() => {
+    if (!props.session) return;
+    const accessToken = props.session?.user?.access_token;
+    console.log('token:' + accessToken);
+
+    setSocket(
+      io(`${process.env.NEXT_PUBLIC_SOCKET_BASE_URL}/draw`, {
+        transports: ['websocket'],
+        query: {
+          token: accessToken,
+        },
+      })
+    );
+  }, [props.session]);
+
+  useEffect(() => {
+    if (!socket) return;
     const ctx = canvasRef.current?.getContext('2d');
     console.log(socket);
-    socket.emit('client-ready');
+    socket.emit('subscribe-room', {
+      roomId: props.roomId,
+      user: props.session?.user,
+    });
 
     socket.on('get-canvas-state', () => {
       console.log('I received the request');

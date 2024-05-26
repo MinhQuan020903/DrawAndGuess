@@ -1,15 +1,16 @@
-import { getSession } from '@/lib/auth';
+import { getSession, mustBeLoggedIn } from '@/lib/auth';
 
-interface ProductsLayoutProps {
-  children: React.ReactNode;
-}
-
-export default async function ProductsLayout({
+export default async function DashboardLayout({
   children,
-}: ProductsLayoutProps) {
+}: {
+  children: React.ReactNode;
+}) {
+  await mustBeLoggedIn();
   const session = await getSession();
-  console.log('🚀 ~ file: layout.tsx:9 ~ session:', session);
+
   return (
-    <div className="w-full h-full items-center justify-center">{children}</div>
+    <div className="">
+      <div className="w-full h-full">{children}</div>
+    </div>
   );
 }
