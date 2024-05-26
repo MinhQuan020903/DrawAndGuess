@@ -6,7 +6,7 @@ import { redirect } from 'next/navigation';
 export async function mustBeLoggedIn() {
   const session = await getServerSession(options);
   console.log('session: ', session);
-  if (!session) {
+  if (!session || !session?.user.display_name) {
     redirect('/');
   }
 }

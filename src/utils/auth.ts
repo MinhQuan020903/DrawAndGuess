@@ -24,7 +24,8 @@ export default async function apiAuthSignIn(
 
     //if 401 unauthorized
     if (!response.ok) {
-      return new Error('Invalid credentials');
+      console.log('Invalid credentials');
+      return { error: 'Invalid credentials' };
     }
 
     const data = await response.json();
@@ -36,7 +37,13 @@ export default async function apiAuthSignIn(
         error: data.error,
       };
     }
+    if (data.accessToken === 'error') {
+      console.log('🚀 ~ error:');
 
+      return {
+        error: 'Invalid credentials',
+      };
+    }
     const userID = data.userID;
     // return data.data;
     return { ...data, userID };

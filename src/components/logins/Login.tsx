@@ -1,9 +1,7 @@
 'use client';
 
 import * as React from 'react';
-import { Flex, Center, Text, Avatar, ScaleFade, Icon } from '@chakra-ui/react';
 import { cn } from '@/lib/utils';
-import { Icons } from '@/assets/Icons';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -42,8 +40,8 @@ const Login = ({ className }: { className?: string; providers: unknown }) => {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      username: '',
-      password: '',
+      username: 'tran_van_a',
+      password: 'password',
     },
   });
   async function onSubmit(data) {
@@ -55,19 +53,20 @@ const Login = ({ className }: { className?: string; providers: unknown }) => {
       password: data.password,
       redirect: false,
     });
-    setIsLoading(false);
+    console.log('🚀 ~ onSubmit ~ res:', res);
 
+    setIsLoading(false);
     if (res?.error) {
       toast.error(res?.error);
 
       return;
+    } else {
+      router.push('/user');
     }
-
-    console.log(res);
     if (!res?.error) router.refresh();
     setIsLoading(false);
-    console.log(res);
-    router.push('/user');
+
+    // router.push('/user');
   }
   if (isLoading)
     return (
@@ -76,7 +75,7 @@ const Login = ({ className }: { className?: string; providers: unknown }) => {
       </div>
     );
   return (
-    <div className="flex flex-row grow  gap-4">
+    <div className="flex flex-row grow gap-4">
       {/* Left */}
       {/* <div className="h-[100%] w-[100%] lg:w-1/2 overflow-auto">
         <div className="w-full flex flex-col items-center justify-center">
@@ -132,10 +131,7 @@ const Login = ({ className }: { className?: string; providers: unknown }) => {
                         render={({ field }) => (
                           <FormItem>
                             <FormControl>
-                              <Input
-                                placeholder="Nhập tên đăng nhập"
-                                {...field}
-                              />
+                              <Input placeholder="tran_van_a" {...field} />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -171,7 +167,7 @@ const Login = ({ className }: { className?: string; providers: unknown }) => {
                                 value={field.value}
                                 onChange={field.onChange}
                                 id="password"
-                                placeholder="Nhập mật khẩu"
+                                placeholder="password"
                                 type={show.showPass ? 'text' : 'password'}
                                 autoCapitalize="none"
                                 autoComplete="password"
@@ -190,7 +186,7 @@ const Login = ({ className }: { className?: string; providers: unknown }) => {
               </form>
             </Form>
 
-            <div className="relative">
+            {/* <div className="relative">
               <div className="absolute inset-0 flex items-center">
                 <span className="w-full border-t" />
               </div>
@@ -240,7 +236,7 @@ const Login = ({ className }: { className?: string; providers: unknown }) => {
                 </div>{' '}
                 Google
               </Button>
-            </div>
+            </div> */}
           </div>
 
           <p className="mt-5 px-8 text-center text-sm text-white">
