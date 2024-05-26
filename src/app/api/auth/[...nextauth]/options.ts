@@ -390,7 +390,7 @@ const options: AuthOptions = {
       //     redirectTo: `/auth/login?email=${session?.user.email}&name=${session?.user.name}`,
       //   };
       // }
-      console.log('token in sessionnnnnnnnnnnnnnnnn: ', token);
+      // console.log('token in sessionnnnnnnnnnnnnnnnn: ', token);
       if (session.user) {
         (session.user as { id: string }).id = token.id as string;
         (session.user as { username: string }).username =

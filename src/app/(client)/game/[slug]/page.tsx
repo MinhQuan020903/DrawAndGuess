@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import CustomCanvas from '@/components/CustomCanvas';
 import { BsEraser } from 'react-icons/bs';
 import { IoMdColorFill } from 'react-icons/io';
@@ -11,9 +11,12 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import PlayHeader from '@/components/headers/playHeader';
 import LeaderBoardComponent from '@/components/leaderboard/LeaderBoardComponent';
+import { getSession } from 'next-auth/react';
+import Loader from '@/components/Loader';
 type SliderProps = React.ComponentProps<typeof Slider>;
 export default function Page({ params }: { params: { slug: string } }) {
-  const router = useRouter();
+  console.log('🚀 ~ Page ~ params:', params);
+
   const [color, setColor] = useState('#000000'); // Brush color
   const [clear, setClear] = useState(false); // Clear Mode 0 or 1
   const [selected, setSelected] = useState(0); // Color mode 0 to 5
@@ -30,6 +33,25 @@ export default function Page({ params }: { params: { slug: string } }) {
     blue: ' #000080',
     eraser: '#ffffff',
   };
+
+  const [session, setSession] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchSession = async () => {
+      const sessionData = await getSession();
+      console.log('🚀 ~ Page ~ session:', sessionData);
+      setSession(sessionData);
+      setLoading(false);
+    };
+
+    fetchSession();
+  }, []);
+
+  if (loading) {
+    return <Loader />;
+  }
+
   return (
     <div className="flex flex-col gap-4 min-h-screen text-white p-24">
       <PlayHeader />
@@ -46,6 +68,8 @@ export default function Page({ params }: { params: { slug: string } }) {
             clear={clear}
             setClear={setClear}
             color={color}
+            session={session}
+            roomId={params.slug}
             className="w-full h-full "
           ></CustomCanvas>
         </div>
