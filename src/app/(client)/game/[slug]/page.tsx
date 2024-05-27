@@ -15,8 +15,6 @@ import { getSession } from 'next-auth/react';
 import Loader from '@/components/Loader';
 type SliderProps = React.ComponentProps<typeof Slider>;
 export default function Page({ params }: { params: { slug: string } }) {
-  console.log('🚀 ~ Page ~ params:', params);
-
   const [color, setColor] = useState('#000000'); // Brush color
   const [clear, setClear] = useState(false); // Clear Mode 0 or 1
   const [selected, setSelected] = useState(0); // Color mode 0 to 5
@@ -40,7 +38,6 @@ export default function Page({ params }: { params: { slug: string } }) {
   useEffect(() => {
     const fetchSession = async () => {
       const sessionData = await getSession();
-      console.log('🚀 ~ Page ~ session:', sessionData);
       setSession(sessionData);
       setLoading(false);
     };

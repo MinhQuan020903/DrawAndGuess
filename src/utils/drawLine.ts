@@ -5,6 +5,7 @@ type DrawLineProps = {
   currentPoint: Point;
   ctx: CanvasRenderingContext2D;
   color: IColor;
+  brushSize: number;
 };
 
 export const drawLine = ({
@@ -12,10 +13,11 @@ export const drawLine = ({
   currentPoint,
   ctx,
   color,
+  brushSize,
 }: DrawLineProps) => {
   const { x: currX, y: currY } = currentPoint;
   const lineColor = color.hex ?? '#000000';
-  const lineWidth = 5;
+  const lineWidth = brushSize;
 
   let startPoint = prevPoint ?? currentPoint;
   ctx.beginPath();
@@ -25,8 +27,9 @@ export const drawLine = ({
   ctx.lineTo(currX, currY);
   ctx.stroke();
 
+  // Draw a circle at the end point to ensure the stroke ends properly
   ctx.fillStyle = lineColor;
   ctx.beginPath();
-  ctx.arc(startPoint.x, startPoint.y, 2, 0, 2 * Math.PI);
+  ctx.arc(currX, currY, lineWidth / 2, 0, 2 * Math.PI);
   ctx.fill();
 };
