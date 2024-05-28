@@ -13,6 +13,8 @@ import PlayHeader from '@/components/headers/playHeader';
 import LeaderBoardComponent from '@/components/leaderboard/LeaderBoardComponent';
 import { getSession } from 'next-auth/react';
 import Loader from '@/components/Loader';
+import { io } from 'socket.io-client';
+import Chat from '../Chat';
 type SliderProps = React.ComponentProps<typeof Slider>;
 export default function Page({ params }: { params: { slug: string } }) {
   const [color, setColor] = useState('#000000'); // Brush color
@@ -20,6 +22,9 @@ export default function Page({ params }: { params: { slug: string } }) {
   const [selected, setSelected] = useState(0); // Color mode 0 to 5
   const [fillMode, setFillMode] = useState(false); // Paint/fill mode
   const [brushSize, setBrushSize] = useState(10);
+
+  const [socket, setSocket] = useState<any>(null);
+
   const colors = {
     black: '#000000',
     brown: '#732620',
@@ -45,7 +50,21 @@ export default function Page({ params }: { params: { slug: string } }) {
     fetchSession();
   }, []);
 
-  if (loading) {
+  useEffect(() => {
+    if (session && !socket) {
+      const accessToken = session?.user?.access_token;
+      setSocket(
+        io(`${process.env.NEXT_PUBLIC_SOCKET_BASE_URL}/draw`, {
+          transports: ['websocket'],
+          query: {
+            token: accessToken,
+          },
+        })
+      );
+    }
+  }, [session, socket]);
+
+  if (loading || !socket || !session) {
     return <Loader />;
   }
 
@@ -67,8 +86,10 @@ export default function Page({ params }: { params: { slug: string } }) {
             color={color}
             session={session}
             roomId={params.slug}
+            socket={socket}
             className="w-full h-full "
           ></CustomCanvas>
+          <Chat socket={socket} user={session?.user}></Chat>
         </div>
         {/* <div className="basis-1/4 flex bg-green-400 rounded-full">
           <ChatComponent />
