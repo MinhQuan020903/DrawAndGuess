@@ -26,6 +26,7 @@ interface CanvasProps {
   session: any;
   roomId: string;
   socket: any;
+  isPlayer: boolean;
 }
 
 const CustomCanvas = (props: CanvasProps) => {
@@ -102,7 +103,7 @@ const CustomCanvas = (props: CanvasProps) => {
       props.socket.off('canvas-state-from-server');
       props.socket.off('clear');
     };
-  }, [props.socket, canvasRef, clear]);
+  }, [canvasRef]);
 
   useEffect(() => {
     if (canvasRef.current && props.clear) {
@@ -234,9 +235,11 @@ const CustomCanvas = (props: CanvasProps) => {
       ref={canvasRef}
       onContextMenu={(event: MouseEvent) => event.preventDefault()}
       onClick={(event: MouseEvent) => {
+        if (!props.isPlayer) return;
         fill(event);
       }}
       onMouseDown={(event: MouseEvent) => {
+        if (!props.isPlayer) return;
         if (event.button == 0) {
           setMouseDown(true);
           const pos = getMousePos(canvasRef.current!, event);
@@ -246,16 +249,21 @@ const CustomCanvas = (props: CanvasProps) => {
         onMouseDown(event); // Call onMouseDown function here
       }}
       onMouseLeave={() => {
+        if (!props.isPlayer) return;
         setMouseDown(false);
         setLastMouseX(null);
         setLastMouseY(null);
       }}
       onMouseUp={() => {
+        if (!props.isPlayer) return;
         setMouseDown(false);
         setLastMouseX(null);
         setLastMouseY(null);
       }}
-      onMouseMove={draw}
+      onMouseMove={(event: MouseEvent) => {
+        if (!props.isPlayer) return;
+        draw(event);
+      }}
       className={props.className}
       height={props.height}
       width={props.width}

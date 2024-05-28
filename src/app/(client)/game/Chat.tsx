@@ -1,7 +1,8 @@
 'use client';
 
 import { cn } from '@/lib/utils';
-import { ScrollShadow } from '@nextui-org/react';
+import { Input, InputGroup, InputRightAddon } from '@chakra-ui/react';
+
 import {
   FC,
   HTMLAttributes,
@@ -10,14 +11,18 @@ import {
   useRef,
   useState,
 } from 'react';
+import { FiNavigation } from 'react-icons/fi';
 
 interface ChatProps extends HTMLAttributes<HTMLDivElement> {
   socket: any;
   user: any;
+  roomId: any;
+  isPlayer: boolean;
 }
 
 const Chat: FC<ChatProps> = ({ className, ...props }) => {
-  const [messages, setMessages] = useState([]);
+  const [messages, setMessages] = useState<string[]>([]);
+  const [input, setInput] = useState('');
   const inverseMessages = [...messages].reverse();
 
   // Scroll to bottom when new message is added
@@ -42,37 +47,68 @@ const Chat: FC<ChatProps> = ({ className, ...props }) => {
   }
 
   return (
-    <ScrollShadow
-      ref={chatContainerRef}
-      isEnabled={false}
-      hideScrollBar
-      className={cn('h-[600px] p-2', className)}
-    >
-      <div {...props} className={cn('flex flex-col-reverse gap-3 ', className)}>
-        <div className="flex-1" />
-        {inverseMessages.map((message, index) => {
-          return (
-            <div className="chat-message" key={index}>
-              <div>
-                <div
-                  className={cn(
-                    'flex flex-col space-y-2 text-sm max-w-xl mx-2 overflow-x-hidden shadow-md rounded-lg'
-                  )}
-                >
-                  <p
+    <div className="w-full h-full flex flex-col gap-3 bg-transparent justify-center items-center">
+      <div
+        ref={chatContainerRef}
+        className={cn(
+          'w-full h-full p-2 overflow-auto bg-white rounded-lg border'
+        )}
+      >
+        <div {...props} className={cn('w-full flex flex-col-reverse gap-3 ')}>
+          <div className="flex-1" />
+          {inverseMessages.map((message, index) => {
+            return (
+              <div className="chat-message" key={index}>
+                <div>
+                  <div
                     className={cn(
-                      'px-4 py-2 rounded-lg bg-gradient-to-r from-primary-400 to-primary text-black'
+                      'flex flex-col space-y-2 text-sm max-w-xl mx-2 overflow-x-hidden shadow-md rounded-lg'
                     )}
                   >
-                    {MultipleLinesParagraph(message)}
-                  </p>
+                    <p
+                      className={cn(
+                        'px-4 py-2 rounded-lg bg-gradient-to-r from-primary-400 to-primary text-black'
+                      )}
+                    >
+                      {MultipleLinesParagraph(message)}
+                    </p>
+                  </div>
                 </div>
               </div>
-            </div>
-          );
-        })}
-      </div>{' '}
-    </ScrollShadow>
+            );
+          })}
+        </div>{' '}
+      </div>
+      {!props.isPlayer && (
+        <InputGroup className="bg-white rounded-lg">
+          {' '}
+          <Input
+            variant="filled"
+            className=" text-black rounded-lg"
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+
+                if (input !== '') {
+                  setMessages([...messages, input]);
+                }
+              }
+            }}
+            onChange={(e) => setInput(e.target.value)}
+          ></Input>
+          <InputRightAddon className="bg-primary-400 hover:bg-slate-300 rounded-lg">
+            <FiNavigation
+              className="text-cyan-700 "
+              onClick={() => {
+                if (input !== '') {
+                  setMessages([...messages, input]);
+                }
+              }}
+            />
+          </InputRightAddon>
+        </InputGroup>
+      )}
+    </div>
   );
 };
 
