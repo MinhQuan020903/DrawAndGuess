@@ -87,6 +87,23 @@ export default function Page({ params }: { params: { slug: string } }) {
     }
   }, [session, socket]);
 
+  useEffect(() => {
+    if (socket) {
+      if (isPlayer) {
+        socket.emit('get-keyword', { userId: session?.user?.id });
+      }
+
+      socket.on('keyword', (data: any) => {
+        console.log('Keyword Received', data);
+        setKeyword(data.message);
+      });
+
+      return () => {
+        socket.off('keyword');
+      };
+    }
+  }, [isPlayer]);
+
   const startGame = () => {
     socket.emit('start-game');
   };
@@ -122,6 +139,7 @@ export default function Page({ params }: { params: { slug: string } }) {
             user={session?.user}
             roomId={params.slug}
             isPlayer={isPlayer}
+            keyword={keyword}
             className="w-[30%] h-full border-3 bg-white rounded-md"
           ></Chat>
         </div>
@@ -135,6 +153,7 @@ export default function Page({ params }: { params: { slug: string } }) {
           <div className="flex flex-row grow gap-2 justify-center items-center">
             {isPlayer && (
               <div className="flex flex-row grow gap-2 justify-center items-center">
+                <div>{keyword}</div>
                 {Object.entries(colors).map(([key, value], index) => (
                   <button
                     key={key}

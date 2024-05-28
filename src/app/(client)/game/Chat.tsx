@@ -18,10 +18,19 @@ interface ChatProps extends HTMLAttributes<HTMLDivElement> {
   user: any;
   roomId: any;
   isPlayer: boolean;
+  keyword: string;
+}
+
+interface GuessMessage {
+  message: string;
+  guessKeyword: string | null;
+  isCorrect: boolean;
 }
 
 const Chat: FC<ChatProps> = ({ className, ...props }) => {
-  const [messages, setMessages] = useState<string[]>([]);
+  const [messages, setMessages] = useState<GuessMessage[]>([]);
+
+  const [guess, setGuess] = useState(''); // Guess word
   const [input, setInput] = useState('');
   const inverseMessages = [...messages].reverse();
 
@@ -34,17 +43,35 @@ const Chat: FC<ChatProps> = ({ className, ...props }) => {
     }
   }, [messages]);
 
-  //Multiple drop lines
-  function MultipleLinesParagraph(text: string) {
-    const descriptionWithLineBreaks = text.split('\n').map((text, index) => (
-      <span key={index}>
-        {text}
-        <br />
-      </span>
-    ));
+  useEffect(() => {
+    if (props.socket) {
+      if (guess !== '') {
+        console.log('Guess: ', guess);
+        props.socket.emit('send-guess', { guess: guess });
+      }
+    }
+  }, [guess]);
 
-    return <p>{descriptionWithLineBreaks}</p>;
-  }
+  useEffect(() => {
+    props.socket.on('validate-guess', (data) => {
+      setMessages((prevMessages) => [...prevMessages, data]);
+    });
+    return () => {
+      props.socket.off('validate-guess');
+    };
+  }, [props.socket]);
+
+  //   //Multiple drop lines
+  //   function MultipleLinesParagraph(text: string) {
+  //     const descriptionWithLineBreaks = text.split('\n').map((text, index) => (
+  //       <span key={index}>
+  //         {text}
+  //         <br />
+  //       </span>
+  //     ));
+
+  //     return <p>{descriptionWithLineBreaks}</p>;
+  //   }
 
   return (
     <div className="w-full h-full flex flex-col gap-3 bg-transparent justify-center items-center">
@@ -70,7 +97,19 @@ const Chat: FC<ChatProps> = ({ className, ...props }) => {
                         'px-4 py-2 rounded-lg bg-gradient-to-r from-primary-400 to-primary text-black'
                       )}
                     >
-                      {MultipleLinesParagraph(message)}
+                      {message.isCorrect ? (
+                        <span className="font-bold text-green-500">
+                          {message.message}
+                        </span>
+                      ) : (
+                        <div className="w-full space-x-1">
+                          <span className="font-bold ">{message.message}</span>
+
+                          <span className="text-yellow-400 font-bold">
+                            {message.guessKeyword}
+                          </span>
+                        </div>
+                      )}
                     </p>
                   </div>
                 </div>
@@ -84,13 +123,15 @@ const Chat: FC<ChatProps> = ({ className, ...props }) => {
           {' '}
           <Input
             variant="filled"
+            value={input}
             className=" text-black rounded-lg"
             onKeyDown={(e) => {
               if (e.key === 'Enter' && !e.shiftKey) {
                 e.preventDefault();
 
                 if (input !== '') {
-                  setMessages([...messages, input]);
+                  setGuess(input);
+                  setInput('');
                 }
               }
             }}
@@ -101,7 +142,8 @@ const Chat: FC<ChatProps> = ({ className, ...props }) => {
               className="text-cyan-700 "
               onClick={() => {
                 if (input !== '') {
-                  setMessages([...messages, input]);
+                  setGuess(input);
+                  setInput('');
                 }
               }}
             />
