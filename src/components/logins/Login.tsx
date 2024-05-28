@@ -40,8 +40,8 @@ const Login = ({ className }: { className?: string; providers: unknown }) => {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      username: 'tran_van_a',
-      password: 'password',
+      username: 'minh_quan',
+      password: 'quan2003',
     },
   });
   async function onSubmit(data) {
@@ -61,7 +61,7 @@ const Login = ({ className }: { className?: string; providers: unknown }) => {
 
       return;
     } else {
-      router.push('/user');
+      router.push('/');
     }
     if (!res?.error) router.refresh();
     setIsLoading(false);
@@ -76,41 +76,6 @@ const Login = ({ className }: { className?: string; providers: unknown }) => {
     );
   return (
     <div className="flex flex-row grow gap-4">
-      {/* Left */}
-      {/* <div className="h-[100%] w-[100%] lg:w-1/2 overflow-auto">
-        <div className="w-full flex flex-col items-center justify-center">
-          <div
-            className={cn(
-              'grid gap-6 w-[80%] md:w-[70%] lg:w-[60%] ',
-              className
-            )}
-          >
-            <div className="w-full justify-center align-middle">
-              <Avatar
-                key={`Lee-avatar`}
-                mr={2}
-                src={`https://api.dicebear.com/5.x/big-smile/svg?seed=Lee`}
-                size="lg"
-              ></Avatar>
-            </div>
-            <div className="flex flex-row gap-2">
-              <span className="basis-1/4">Username: </span>
-              <input
-                className=" basis-3/4 p-2 text-black rounded-md "
-                placeholder="boby"
-              ></input>
-            </div>
-            <div className="flex flex-row gap-2">
-              <span className="basis-1/4">Game Code: </span>
-              <input
-                className="p-2 text-black rounded-md basis-3/4"
-                placeholder="SJKHNQ"
-              ></input>
-            </div>
-            <Button onClick={() => router.push('game/1')}>Join Game</Button>
-          </div>
-        </div>
-      </div> */}
       <div className="h-[100%] w-[100%]  overflow-auto">
         <div className="w-full flex flex-col items-center justify-center">
           <div
@@ -185,58 +150,6 @@ const Login = ({ className }: { className?: string; providers: unknown }) => {
                 </div>
               </form>
             </Form>
-
-            {/* <div className="relative">
-              <div className="absolute inset-0 flex items-center">
-                <span className="w-full border-t" />
-              </div>
-              <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-background px-2 text-muted-foreground">
-                  Hoặc có thể tiếp tục với
-                </span>
-              </div>
-            </div>
-            <div className="w-full flex gap-6">
-              <Button
-                className="w-1/2 "
-                onClick={() => {
-                  // signIn('github');
-                }}
-                variant="outline"
-                disabled={isLoading}
-              >
-                <div>
-                  <Icons.gitHub className="mr-2 h-4 w-4" />
-                </div>{' '}
-                Github
-              </Button>
-              <Button
-                className="w-1/2"
-                onClick={() => {
-                  // signIn('discord');
-                }}
-                variant="outline"
-                disabled={isLoading}
-              >
-                <div>
-                  <Icons.discord className="mr-2 h-4 w-4" />
-                </div>{' '}
-                Discord
-              </Button>
-              <Button
-                className="w-1/2"
-                onClick={() => {
-                  // signIn('google');
-                }}
-                variant="outline"
-                disabled={isLoading}
-              >
-                <div>
-                  <Icons.google className="mr-2 h-4 w-4" />
-                </div>{' '}
-                Google
-              </Button>
-            </div> */}
           </div>
 
           <p className="mt-5 px-8 text-center text-sm text-white">
