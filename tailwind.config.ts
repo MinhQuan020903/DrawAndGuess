@@ -1,3 +1,4 @@
+import { nextui } from '@nextui-org/react';
 import type { Config } from 'tailwindcss';
 
 const config: Config = {
@@ -60,6 +61,11 @@ const config: Config = {
       },
     },
   },
-  plugins: [require('tailwindcss-animate'), require('@tailwindcss/typography')],
+  plugins: [
+    require('tailwindcss'),
+    require('tailwindcss-animate'),
+    require('@tailwindcss/typography'),
+    require('autoprefixer'),
+  ],
 };
 export default config;

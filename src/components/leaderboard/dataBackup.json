@@ -1,0 +1,37 @@
+[
+  {
+    "currentTurn": false,
+    "nextTurn": false,
+    "LO": {
+      "Name": "Mel"
+    },
+
+    "points": 38
+  },
+  {
+    "currentTurn": false,
+    "nextTurn": false,
+    "points": 40,
+    "LO": {
+      "Name": "Ben "
+    }
+  },
+  {
+    "currentTurn": false,
+    "nextTurn": false,
+    "LO": {
+      "Name": "Trevor"
+    },
+
+    "points": 23
+  },
+
+  {
+    "currentTurn": false,
+    "nextTurn": false,
+    "points": 45,
+    "LO": {
+      "Name": "Elouise"
+    }
+  }
+]

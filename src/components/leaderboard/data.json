@@ -1,0 +1,68 @@
+[
+  {
+    "currentTurn": true,
+    "nextTurn": false,
+    "points": 10,
+    "LO": {
+      "Name": "Lee"
+    }
+  },
+  {
+    "currentTurn": false,
+    "nextTurn": true,
+    "points": 50,
+    "LO": {
+      "Name": "Sean"
+    }
+  },
+  {
+    "currentTurn": false,
+    "nextTurn": false,
+    "LO": {
+      "Name": "Pascual"
+    },
+    "points": 34
+  },
+  {
+    "currentTurn": false,
+    "nextTurn": false,
+    "points": 49,
+    "LO": {
+      "Name": "Brittany"
+    }
+  },
+  {
+    "currentTurn": false,
+    "nextTurn": false,
+    "points": 30,
+    "LO": {
+      "Name": "Alex"
+    }
+  },
+  {
+    "currentTurn": false,
+    "nextTurn": false,
+    "points": 25,
+    "LO": {
+      "Name": "Pax"
+    }
+  },
+  {
+    "currentTurn": false,
+    "nextTurn": false,
+    "points": 11,
+
+    "LO": {
+      "Name": "Tyler"
+    }
+  },
+  {
+    "currentTurn": false,
+    "nextTurn": false,
+    "LO": {
+      "Name": "Tim"
+    },
+
+    "points": 54
+  }
+]
