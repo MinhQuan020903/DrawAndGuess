@@ -37,7 +37,6 @@ const LeaderBoardEntry = ({ row }) => {
         >
           <Flex
             flexDir={'row'}
-            key={`row-${row.LO.Name}`}
             py={3}
             px={1}
             mb={3}
@@ -59,12 +58,11 @@ const LeaderBoardEntry = ({ row }) => {
                 </div>
 
                 <Avatar
-                  key={`${row.LO.Name}-avatar`}
                   mr={2}
-                  src={`https://api.dicebear.com/5.x/big-smile/svg?seed=${row.LO.Name}`}
+                  src={`https://api.dicebear.com/5.x/big-smile/svg?seed=${row.detail.avatar}`}
                   size="sm"
                 ></Avatar>
-                <Flex key={row.LO.Name} flexDir={'column'}>
+                <Flex flexDir={'column'}>
                   <Text
                     fontWeight={
                       newRow.points == oldRow.points ? 'normal' : 'semibold'
@@ -72,7 +70,7 @@ const LeaderBoardEntry = ({ row }) => {
                     fontSize="sm"
                     color={'black'}
                   >
-                    {row.LO.Name}
+                    {row.detail.username}
                   </Text>
                   <Text
                     as="em"
@@ -89,16 +87,6 @@ const LeaderBoardEntry = ({ row }) => {
                       start={oldRow.points}
                       end={newRow.points}
                     />
-                  </Text>
-                  <Text
-                    as="em"
-                    color={'blue'}
-                    fontSize="xs"
-                    fontWeight={
-                      newRow.points == oldRow.points ? 'normal' : 'extrabold'
-                    }
-                  >
-                    {row.nextTurn ? 'Next to draw' : ''}
                   </Text>
                 </Flex>
               </Center>

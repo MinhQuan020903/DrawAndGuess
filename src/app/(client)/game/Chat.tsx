@@ -1,6 +1,7 @@
 'use client';
 
 import { cn } from '@/lib/utils';
+import { Player } from '@/types/types';
 import { Input, InputGroup, InputRightAddon } from '@chakra-ui/react';
 
 import {
@@ -19,6 +20,9 @@ interface ChatProps extends HTMLAttributes<HTMLDivElement> {
   roomId: any;
   isPlayer: boolean;
   keyword: string;
+  timer: number;
+  totalTimer: number;
+  setPlayers: any;
 }
 
 interface GuessMessage {
@@ -51,6 +55,7 @@ const Chat: FC<ChatProps> = ({ className, ...props }) => {
           id: props.user.id,
           username: props.user.username,
           guess: guess,
+          guessPoint: Math.round((props.timer * 100) / props.totalTimer),
         });
       }
     }
@@ -58,6 +63,20 @@ const Chat: FC<ChatProps> = ({ className, ...props }) => {
 
   useEffect(() => {
     props.socket.on('validate-guess', (data) => {
+      if (data.isCorrect) {
+        console.log('Correct Guess', data);
+        props.setPlayers((prevPlayers: Player[]) => {
+          return prevPlayers.map((player) => {
+            if (player.id == data.userId) {
+              return {
+                ...player,
+                points: player.points + data.guessPoint,
+              };
+            }
+            return player;
+          });
+        });
+      }
       setMessages((prevMessages) => [...prevMessages, data]);
     });
     return () => {

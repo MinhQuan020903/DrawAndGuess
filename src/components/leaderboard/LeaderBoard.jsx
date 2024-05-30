@@ -37,21 +37,17 @@ import {
 import { Reorder } from 'framer-motion';
 import LeaderBoardEntry from './LeaderBoardEntry';
 
-export default function LeaderBoard({ initTimeline, currentData }) {
-  const [timeline, setTimeline] = useState(
-    initTimeline ? initTimeline : 'Lifetime'
-  );
+export default function LeaderBoard({ currentData, setPlayers }) {
   const [sortedData, setSortedData] = useState();
 
   useEffect(() => {
-    console.log('sorting');
     const sortData = () => {
       if (currentData) {
         setSortedData(sortArrayByProperty('points'));
       }
     };
     sortData();
-  }, [currentData]);
+  }, [setPlayers, currentData]);
 
   const sortArrayByProperty = (prop) => {
     return [...currentData].sort((a, b) => b[`${prop}`] - a[`${prop}`]);
@@ -93,16 +89,12 @@ export default function LeaderBoard({ initTimeline, currentData }) {
                   return (
                     <Reorder.Item
                       as="div"
-                      key={`${row.LO.Name}`}
+                      key={`${row.id}`}
                       dragListener={false}
                       draggable={false}
                       value={row}
                     >
-                      <LeaderBoardEntry
-                        key={`${row.LO.Name}`}
-                        row={row}
-                        timeline={timeline}
-                      />
+                      <LeaderBoardEntry row={row} />
                     </Reorder.Item>
                   );
                 })}

@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { use, useEffect, useState } from 'react';
 import CustomCanvas from '@/components/CustomCanvas';
 import { BsEraser } from 'react-icons/bs';
 import { IoMdColorFill } from 'react-icons/io';
@@ -13,6 +13,7 @@ import Chat from '../Chat';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Timer from '../Timer';
+import { Player } from '@/types/types';
 
 export default function Page({ params }: { params: { slug: string } }) {
   const [color, setColor] = useState('#000000'); // Brush color
@@ -27,7 +28,8 @@ export default function Page({ params }: { params: { slug: string } }) {
   const [isPlayer, setIsPlayer] = useState(false); // Player status [player or not player]
 
   const totalTimer = 10000;
-  const [timer, setTimer] = useState(totalTimer); // Timer for the game 10 seconds
+  const [timer, setTimer] = useState(totalTimer); // Timer [10 seconds]
+  const [players, setPlayers] = useState<Player[]>([]);
 
   const colors = {
     black: '#000000',
@@ -39,7 +41,7 @@ export default function Page({ params }: { params: { slug: string } }) {
     cyan: '#00FFFF',
     blue: ' #000080',
     eraser: '#ffffff',
-  };
+  }; // Players in the game [leaderboard]
 
   const [session, setSession] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -87,17 +89,34 @@ export default function Page({ params }: { params: { slug: string } }) {
     }
   }, [isPlayer]);
 
-  useEffect(() => {
-    if (isPlaying) console.log('start game!!!!!!!!');
-    else console.log('end game!!!!!!!!');
-  }, [isPlaying]);
-
   //Check timer, if timer is 0, end game
   useEffect(() => {
     if (timer === 0) {
       setIsPlaying(false);
+
+      if (isPlayer) socket.emit('end-game');
+
+      socket.on('drawer-score', (data) => {
+        console.log('🚀 ~ socket.on drawerscore~ data:', data);
+        setPlayers((prevPlayers: Player[]) => {
+          return prevPlayers.map((player) => {
+            if (player.id == data.userId) {
+              return {
+                ...player,
+                points: player.points + data.guessPoint,
+              };
+            }
+            return player;
+          });
+        });
+      });
+
       setIsPlayer(false);
-      socket.emit('end-game');
+
+      return () => {
+        socket.off('end-game');
+        socket.off('drawer-score');
+      };
     }
   }, [socket, timer]);
 
@@ -109,9 +128,11 @@ export default function Page({ params }: { params: { slug: string } }) {
         user: session?.user,
       });
 
-      socket.on('subscribed', (data) => {
-        console.log(data.message);
-      });
+      const handleSubscribed = (data) => {
+        setPlayers(data);
+      };
+
+      socket.on('subscribed', handleSubscribed);
 
       const handleStartGame = (data: any) => {
         setIsPlaying(true);
@@ -129,14 +150,25 @@ export default function Page({ params }: { params: { slug: string } }) {
 
       socket.on('server-start-game', handleStartGame);
 
+      socket.on('player-disconnect', (data) => {
+        console.log('some player disconnected', data);
+        setPlayers(data);
+      });
+
+      // Clean up event listeners
       return () => {
-        socket.off('subscribed');
+        socket.off('subscribed', handleSubscribed);
+        socket.off('player-disconnect');
         socket.off('server-start-game', handleStartGame);
       };
     }
   }, [socket, session, params.slug]);
 
   const startGame = () => {
+    if (players.length < 2) {
+      toast.error('You need at least 2 players to start the game!');
+      return;
+    }
     socket.emit('start-game');
   };
 
@@ -147,11 +179,16 @@ export default function Page({ params }: { params: { slug: string } }) {
   return (
     <div className="flex flex-col gap-4 min-h-screen text-white p-24">
       <ToastContainer />
-      <PlayHeader />
+      <PlayHeader socket={socket} />
       {/* Body */}
       <div className="flex flex-row grow gap-4">
         <div className="w-[25%] flex">
-          <LeaderBoardComponent socket={socket} />
+          <LeaderBoardComponent
+            socket={socket}
+            isPlaying={isPlaying}
+            players={players}
+            setPlayers={setPlayers}
+          />
         </div>
         <div className="w-[75%] flex flex-row rounded-md gap-3 justify-between">
           <div className="flex flex-col gap-3">
@@ -186,6 +223,9 @@ export default function Page({ params }: { params: { slug: string } }) {
               roomId={params.slug}
               isPlayer={isPlayer}
               keyword={keyword}
+              timer={timer}
+              totalTimer={totalTimer}
+              setPlayers={setPlayers}
               className="w-[30%] h-full border-3 bg-white rounded-md"
             ></Chat>
           )}

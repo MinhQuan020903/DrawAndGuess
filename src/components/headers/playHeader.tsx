@@ -2,8 +2,14 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 
-export default function PlayHeader() {
+export default function PlayHeader({ socket }) {
   const router = useRouter();
+
+  const exitGame = () => {
+    if (!socket) return;
+    socket.disconnect();
+    router.push('/');
+  };
   return (
     <h1 className="w-full  px-5 md:px-10 mx-auto flex justify-between flex-col md:flex-row gap-[50px] md:gap-[50px]">
       <div className="flex flex-col gap-3 shrink-0">
@@ -24,7 +30,7 @@ export default function PlayHeader() {
       <div className="flex flex-col gap-3 shrink-0 justify-center align-middle"></div>
 
       <div className="flex flex-col gap-3 shrink-0 justify-center align-middle">
-        <Button className="w-full" onClick={() => router.push('/')}>
+        <Button className="w-full" onClick={exitGame}>
           X
         </Button>
       </div>
