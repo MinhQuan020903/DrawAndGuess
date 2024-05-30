@@ -47,7 +47,11 @@ const Chat: FC<ChatProps> = ({ className, ...props }) => {
     if (props.socket) {
       if (guess !== '') {
         console.log('Guess: ', guess);
-        props.socket.emit('send-guess', { guess: guess });
+        props.socket.emit('send-guess', {
+          id: props.user.id,
+          username: props.user.username,
+          guess: guess,
+        });
       }
     }
   }, [guess]);
@@ -74,14 +78,22 @@ const Chat: FC<ChatProps> = ({ className, ...props }) => {
   //   }
 
   return (
-    <div className="w-full h-full flex flex-col gap-3 bg-transparent justify-center items-center">
+    <div
+      className={cn(
+        className,
+        `flex flex-col gap-3 bg-transparent justify-center items-center`
+      )}
+    >
       <div
         ref={chatContainerRef}
         className={cn(
-          'w-full h-full p-2 overflow-auto bg-white rounded-lg border'
+          'w-full h-full p-2 overflow-auto bg-white rounded-lg border flex flex-col items-center'
         )}
       >
-        <div {...props} className={cn('w-full flex flex-col-reverse gap-3 ')}>
+        <span className="w-full text-center text-cyan-600 text-lg font-bold">
+          Answers
+        </span>
+        <div {...props} className={cn('w-full flex flex-col-reverse gap-3')}>
           <div className="flex-1" />
           {inverseMessages.map((message, index) => {
             return (

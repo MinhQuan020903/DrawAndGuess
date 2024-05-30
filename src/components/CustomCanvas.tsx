@@ -1,16 +1,7 @@
 'use client';
 import { useRef, useEffect, MouseEvent, useState } from 'react';
-import {
-  ColorPicker,
-  Hue,
-  IColor,
-  Saturation,
-  useColor,
-} from 'react-color-palette';
-
+import { IColor, useColor } from 'react-color-palette';
 import { useDraw } from '@/hooks/useDraw';
-
-import { io } from 'socket.io-client';
 import { drawLine } from '../utils/drawLine';
 import { useRouter } from 'next/router';
 
@@ -27,6 +18,7 @@ interface CanvasProps {
   roomId: string;
   socket: any;
   isPlayer: boolean;
+  isPlaying: boolean;
 }
 
 const CustomCanvas = (props: CanvasProps) => {
@@ -36,74 +28,55 @@ const CustomCanvas = (props: CanvasProps) => {
   const { canvasRef, onMouseDown, clear } = useDraw(() => {});
   const [color, setColor] = useColor(props.color);
 
-  function getMousePos(canvas: HTMLCanvasElement, evt: MouseEvent) {
-    var rect = canvas.getBoundingClientRect();
-    return {
-      x: ((evt.clientX - rect.left) / (rect.right - rect.left)) * canvas.width,
-      y: ((evt.clientY - rect.top) / (rect.bottom - rect.top)) * canvas.height,
-    };
-  }
-
   useEffect(() => {
     if (!props.socket) return;
-    const ctx = canvasRef.current?.getContext('2d');
-    console.log(props.socket);
-    props.socket.emit('subscribe-room', {
-      roomId: props.roomId,
-      user: props.session?.user,
+
+    if (!props.isPlaying) {
+      clear();
+    }
+
+    const handleCanvasStateFromServer = (data: { canvasState: string }) => {
+      const ctx = canvasRef.current?.getContext('2d');
+      const img = new Image();
+      img.src = data.canvasState;
+      img.onload = () => {
+        ctx?.drawImage(img, 0, 0);
+      };
+    };
+
+    const handleDrawLine = (line: {
+      prevPoint: Point;
+      currentPoint: Point;
+      color: IColor;
+      brushSize: number;
+    }) => {
+      const ctx = canvasRef.current?.getContext('2d');
+      if (!ctx) return;
+      drawLine({ ...line, ctx, brushSize: line.brushSize });
+    };
+
+    const handleClear = () => clear();
+
+    props.socket.on('canvas-state-from-server', handleCanvasStateFromServer);
+    props.socket.on('draw-line', handleDrawLine);
+    props.socket.on('clear', handleClear);
+
+    props.socket.on('connect_error', (err) => {
+      console.error('Socket connect error:', err);
     });
 
-    props.socket.on('request-canvas-state', (data) => {
-      console.log('I received the request: ', data);
-
-      if (data.id === props.session?.user?.id) {
-        if (canvasRef.current) {
-          const dataURL = canvasRef.current.toDataURL();
-          console.log('sending canvas state: ' + dataURL);
-          props.socket.emit('canvas-state', {
-            canvasState: dataURL,
-          });
-        } else {
-          console.log('canvasRef is null');
-        }
-      }
+    props.socket.on('disconnect', (reason) => {
+      console.warn('Socket disconnected:', reason);
     });
-
-    props.socket.on(
-      'canvas-state-from-server',
-      (data: { canvasState: string }) => {
-        console.log('I received the state');
-        const img = new Image();
-        img.src = data.canvasState;
-        img.onload = () => {
-          ctx?.drawImage(img, 0, 0);
-        };
-      }
-    );
-
-    props.socket.on(
-      'draw-line',
-      (line: {
-        prevPoint: Point;
-        currentPoint: Point;
-        color: IColor;
-        brushSize: number;
-      }) => {
-        if (!ctx) return console.log('no ctx here');
-
-        drawLine({ ...line, ctx, brushSize: line.brushSize });
-      }
-    );
-
-    props.socket.on('clear', clear);
 
     return () => {
-      props.socket.off('draw-line');
-      props.socket.off('request-canvas-state');
-      props.socket.off('canvas-state-from-server');
-      props.socket.off('clear');
+      props.socket.off('canvas-state-from-server', handleCanvasStateFromServer);
+      props.socket.off('draw-line', handleDrawLine);
+      props.socket.off('clear', handleClear);
+      props.socket.off('connect_error');
+      props.socket.off('disconnect');
     };
-  }, [canvasRef]);
+  }, [canvasRef, props.socket, clear]);
 
   useEffect(() => {
     if (canvasRef.current && props.clear) {
@@ -113,7 +86,15 @@ const CustomCanvas = (props: CanvasProps) => {
       props.setClear(false);
       props.socket.emit('clear', true);
     }
-  }, [props.clear]);
+  }, [props.clear, props.socket, canvasRef]);
+
+  function getMousePos(canvas: HTMLCanvasElement, evt: MouseEvent) {
+    const rect = canvas.getBoundingClientRect();
+    return {
+      x: ((evt.clientX - rect.left) / (rect.right - rect.left)) * canvas.width,
+      y: ((evt.clientY - rect.top) / (rect.bottom - rect.top)) * canvas.height,
+    };
+  }
 
   function interpolate(
     x: number,
@@ -122,12 +103,12 @@ const CustomCanvas = (props: CanvasProps) => {
     y2: number,
     context: CanvasRenderingContext2D
   ) {
-    var a = x - x2;
-    var b = y - y2;
-    var c = Math.hypot(a, b);
-    var interpolation = (20 / props.brushSize) * 40;
+    const a = x - x2;
+    const b = y - y2;
+    const c = Math.hypot(a, b);
+    const interpolation = (20 / props.brushSize) * 40;
     if (c > 10) {
-      for (var i = 1; i <= interpolation; i++) {
+      for (let i = 1; i <= interpolation; i++) {
         context.fillStyle = props.color;
         context.beginPath();
         context.arc(
@@ -146,9 +127,9 @@ const CustomCanvas = (props: CanvasProps) => {
     if (canvasRef.current && mouseDown && !props.fillMode) {
       const canvas = canvasRef.current;
       const context = canvas.getContext('2d')!;
-      var pos = getMousePos(canvas, e);
-      var posx = pos.x;
-      var posy = pos.y;
+      const pos = getMousePos(canvas, e);
+      const posx = pos.x;
+      const posy = pos.y;
       if (lastMouseX !== null && lastMouseY !== null) {
         interpolate(lastMouseX, lastMouseY, posx, posy, context);
       }
@@ -159,19 +140,18 @@ const CustomCanvas = (props: CanvasProps) => {
       setLastMouseX(posx);
       setLastMouseY(posy);
 
-      // Emit the draw-line event to the socket with brush size
       props.socket.emit('draw-line', {
         prevPoint: { x: lastMouseX, y: lastMouseY },
         currentPoint: { x: posx, y: posy },
         color,
-        brushSize: props.brushSize, // Include brush size here
+        brushSize: props.brushSize,
       });
     }
   }
 
   function getPixel(imgData: Uint8ClampedArray, index: number) {
-    var i = Math.floor(index * 4);
-    var d = imgData;
+    const i = Math.floor(index * 4);
+    const d = imgData;
     return [d[i], d[i + 1], d[i + 2], d[i + 3]]; // Returns array [R,G,B,A]
   }
 
@@ -180,7 +160,7 @@ const CustomCanvas = (props: CanvasProps) => {
     if (a == null || b == null) return false;
     if (a.length !== b.length) return false;
 
-    for (var i = 0; i < a.length; ++i) {
+    for (let i = 0; i < a.length; ++i) {
       if (a[i] !== b[i]) return false;
     }
     return true;
@@ -206,8 +186,8 @@ const CustomCanvas = (props: CanvasProps) => {
 
       while (stack.length > 0) {
         const currPos = stack.shift()!;
-        var currX = currPos[0];
-        var currY = currPos[1];
+        const currX = currPos[0];
+        const currY = currPos[1];
         const pixelKey = `${currX},${currY}`;
 
         if (
@@ -240,13 +220,13 @@ const CustomCanvas = (props: CanvasProps) => {
       }}
       onMouseDown={(event: MouseEvent) => {
         if (!props.isPlayer) return;
-        if (event.button == 0) {
+        if (event.button === 0) {
           setMouseDown(true);
           const pos = getMousePos(canvasRef.current!, event);
           setLastMouseX(pos.x);
           setLastMouseY(pos.y);
         }
-        onMouseDown(event); // Call onMouseDown function here
+        onMouseDown(event);
       }}
       onMouseLeave={() => {
         if (!props.isPlayer) return;
