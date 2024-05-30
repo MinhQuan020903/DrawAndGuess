@@ -1,6 +1,7 @@
 'use client';
 
 import { cn } from '@/lib/utils';
+import { Player } from '@/types/types';
 import { Input, InputGroup, InputRightAddon } from '@chakra-ui/react';
 
 import {
@@ -19,6 +20,9 @@ interface ChatProps extends HTMLAttributes<HTMLDivElement> {
   roomId: any;
   isPlayer: boolean;
   keyword: string;
+  timer: number;
+  totalTimer: number;
+  setPlayers: any;
 }
 
 interface GuessMessage {
@@ -47,13 +51,32 @@ const Chat: FC<ChatProps> = ({ className, ...props }) => {
     if (props.socket) {
       if (guess !== '') {
         console.log('Guess: ', guess);
-        props.socket.emit('send-guess', { guess: guess });
+        props.socket.emit('send-guess', {
+          id: props.user.id,
+          username: props.user.username,
+          guess: guess,
+          guessPoint: Math.round((props.timer * 100) / props.totalTimer),
+        });
       }
     }
   }, [guess]);
 
   useEffect(() => {
     props.socket.on('validate-guess', (data) => {
+      if (data.isCorrect) {
+        console.log('Correct Guess', data);
+        props.setPlayers((prevPlayers: Player[]) => {
+          return prevPlayers.map((player) => {
+            if (player.id == data.userId) {
+              return {
+                ...player,
+                points: player.points + data.guessPoint,
+              };
+            }
+            return player;
+          });
+        });
+      }
       setMessages((prevMessages) => [...prevMessages, data]);
     });
     return () => {
@@ -74,14 +97,22 @@ const Chat: FC<ChatProps> = ({ className, ...props }) => {
   //   }
 
   return (
-    <div className="w-full h-full flex flex-col gap-3 bg-transparent justify-center items-center">
+    <div
+      className={cn(
+        className,
+        `flex flex-col gap-3 bg-transparent justify-center items-center`
+      )}
+    >
       <div
         ref={chatContainerRef}
         className={cn(
-          'w-full h-full p-2 overflow-auto bg-white rounded-lg border'
+          'w-full h-full p-2 overflow-auto bg-white rounded-lg border flex flex-col items-center'
         )}
       >
-        <div {...props} className={cn('w-full flex flex-col-reverse gap-3 ')}>
+        <span className="w-full text-center text-cyan-600 text-lg font-bold">
+          Answers
+        </span>
+        <div {...props} className={cn('w-full flex flex-col-reverse gap-3')}>
           <div className="flex-1" />
           {inverseMessages.map((message, index) => {
             return (

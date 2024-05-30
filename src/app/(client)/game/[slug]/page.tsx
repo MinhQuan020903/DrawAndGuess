@@ -1,12 +1,9 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { use, useEffect, useState } from 'react';
 import CustomCanvas from '@/components/CustomCanvas';
 import { BsEraser } from 'react-icons/bs';
 import { IoMdColorFill } from 'react-icons/io';
 import { Slider } from '@/components/ui/slider';
-import ChatComponent from '@/components/chat';
-import Image from 'next/image';
-import { useRouter } from 'next/navigation';
 import PlayHeader from '@/components/headers/playHeader';
 import LeaderBoardComponent from '@/components/leaderboard/LeaderBoardComponent';
 import { getSession } from 'next-auth/react';
@@ -15,8 +12,8 @@ import { io } from 'socket.io-client';
 import Chat from '../Chat';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-
-type SliderProps = React.ComponentProps<typeof Slider>;
+import Timer from '../Timer';
+import { Player } from '@/types/types';
 
 export default function Page({ params }: { params: { slug: string } }) {
   const [color, setColor] = useState('#000000'); // Brush color
@@ -28,7 +25,11 @@ export default function Page({ params }: { params: { slug: string } }) {
   const [socket, setSocket] = useState<any>(null);
   const [keyword, setKeyword] = useState(''); // Game keyword
   const [isPlaying, setIsPlaying] = useState(false); // Game status [playing or not playing]
-  const [isPlayer, setIsPlayer] = useState(false); // Player status [player or not player
+  const [isPlayer, setIsPlayer] = useState(false); // Player status [player or not player]
+
+  const totalTimer = 10000;
+  const [timer, setTimer] = useState(totalTimer); // Timer [10 seconds]
+  const [players, setPlayers] = useState<Player[]>([]);
 
   const colors = {
     black: '#000000',
@@ -40,11 +41,12 @@ export default function Page({ params }: { params: { slug: string } }) {
     cyan: '#00FFFF',
     blue: ' #000080',
     eraser: '#ffffff',
-  };
+  }; // Players in the game [leaderboard]
 
   const [session, setSession] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
+  //Get session
   useEffect(() => {
     const fetchSession = async () => {
       const sessionData = await getSession();
@@ -55,24 +57,91 @@ export default function Page({ params }: { params: { slug: string } }) {
     fetchSession();
   }, []);
 
+  //Connect socket
   useEffect(() => {
     if (session && !socket) {
       const accessToken = session?.user?.access_token;
-      setSocket(
-        io(`${process.env.NEXT_PUBLIC_SOCKET_BASE_URL}/draw`, {
-          transports: ['websocket'],
-          query: {
-            token: accessToken,
-          },
-        })
-      );
+      const newSocket = io(`${process.env.NEXT_PUBLIC_SOCKET_BASE_URL}/draw`, {
+        transports: ['websocket'],
+        query: {
+          token: accessToken,
+        },
+      });
+      setSocket(newSocket);
     }
+  }, [session]);
+
+  //Get keyword
+  useEffect(() => {
     if (socket) {
+      if (isPlayer) {
+        socket.emit('get-keyword', { userId: session?.user?.id });
+      }
+      socket.on('keyword', (data: any) => {
+        console.log('Keyword Received', data);
+        setKeyword(data.message);
+      });
+
+      return () => {
+        socket.off('get-keyword');
+        socket.off('keyword');
+      };
+    }
+  }, [isPlayer]);
+
+  //Check timer, if timer is 0, end game
+  useEffect(() => {
+    if (timer === 0) {
+      setIsPlaying(false);
+
+      if (isPlayer) socket.emit('end-game');
+
+      socket.on('drawer-score', (data) => {
+        console.log('🚀 ~ socket.on drawerscore~ data:', data);
+        setPlayers((prevPlayers: Player[]) => {
+          return prevPlayers.map((player) => {
+            if (player.id == data.userId) {
+              return {
+                ...player,
+                points: player.points + data.guessPoint,
+              };
+            }
+            return player;
+          });
+        });
+      });
+
+      setIsPlayer(false);
+
+      return () => {
+        socket.off('end-game');
+        socket.off('drawer-score');
+      };
+    }
+  }, [socket, timer]);
+
+  //Start game
+  useEffect(() => {
+    if (socket) {
+      socket.emit('subscribe-room', {
+        roomId: params.slug,
+        user: session?.user,
+      });
+
+      const handleSubscribed = (data) => {
+        setPlayers(data);
+      };
+
+      socket.on('subscribed', handleSubscribed);
+
       const handleStartGame = (data: any) => {
-        console.log('Game Started', data);
         setIsPlaying(true);
+
+        console.log('Game Started', data);
+
         if (data.userId === session?.user?.id) {
           setIsPlayer(true);
+          console.log('You are the player!');
           toast.success('Game Started, you are the player!');
         } else {
           setIsPlayer(false);
@@ -81,30 +150,25 @@ export default function Page({ params }: { params: { slug: string } }) {
 
       socket.on('server-start-game', handleStartGame);
 
+      socket.on('player-disconnect', (data) => {
+        console.log('some player disconnected', data);
+        setPlayers(data);
+      });
+
+      // Clean up event listeners
       return () => {
+        socket.off('subscribed', handleSubscribed);
+        socket.off('player-disconnect');
         socket.off('server-start-game', handleStartGame);
       };
     }
-  }, [session, socket]);
-
-  useEffect(() => {
-    if (socket) {
-      if (isPlayer) {
-        socket.emit('get-keyword', { userId: session?.user?.id });
-      }
-
-      socket.on('keyword', (data: any) => {
-        console.log('Keyword Received', data);
-        setKeyword(data.message);
-      });
-
-      return () => {
-        socket.off('keyword');
-      };
-    }
-  }, [isPlayer]);
+  }, [socket, session, params.slug]);
 
   const startGame = () => {
+    if (players.length < 2) {
+      toast.error('You need at least 2 players to start the game!');
+      return;
+    }
     socket.emit('start-game');
   };
 
@@ -115,33 +179,56 @@ export default function Page({ params }: { params: { slug: string } }) {
   return (
     <div className="flex flex-col gap-4 min-h-screen text-white p-24">
       <ToastContainer />
-      <PlayHeader />
+      <PlayHeader socket={socket} />
       {/* Body */}
       <div className="flex flex-row grow gap-4">
-        <div className="basis-1/4 flex ">
-          <LeaderBoardComponent />
+        <div className="w-[25%] flex">
+          <LeaderBoardComponent
+            socket={socket}
+            isPlaying={isPlaying}
+            players={players}
+            setPlayers={setPlayers}
+          />
         </div>
-        <div className="basis-3/4 flex flex-row rounded-md  gap-3">
-          <CustomCanvas
-            fillMode={fillMode}
-            brushSize={brushSize}
-            clear={clear}
-            setClear={setClear}
-            color={color}
-            session={session}
-            roomId={params.slug}
-            socket={socket}
-            isPlayer={isPlayer}
-            className="w-[70%] h-full bg-white"
-          ></CustomCanvas>
-          <Chat
-            socket={socket}
-            user={session?.user}
-            roomId={params.slug}
-            isPlayer={isPlayer}
-            keyword={keyword}
-            className="w-[30%] h-full border-3 bg-white rounded-md"
-          ></Chat>
+        <div className="w-[75%] flex flex-row rounded-md gap-3 justify-between">
+          <div className="flex flex-col gap-3">
+            <CustomCanvas
+              fillMode={fillMode}
+              brushSize={brushSize}
+              clear={clear}
+              setClear={setClear}
+              color={color}
+              session={session}
+              roomId={params.slug}
+              socket={socket}
+              isPlayer={isPlayer}
+              isPlaying={isPlaying}
+              className={`${isPlaying ? 'h-[90%]' : 'h-full'} w-full bg-white`}
+            ></CustomCanvas>
+            <div className="w-full h-[10%]">
+              {isPlaying && (
+                <Timer
+                  timer={timer}
+                  setTimer={setTimer}
+                  totalTimer={totalTimer}
+                />
+              )}
+            </div>
+          </div>
+
+          {isPlaying && (
+            <Chat
+              socket={socket}
+              user={session?.user}
+              roomId={params.slug}
+              isPlayer={isPlayer}
+              keyword={keyword}
+              timer={timer}
+              totalTimer={totalTimer}
+              setPlayers={setPlayers}
+              className="w-[30%] h-full border-3 bg-white rounded-md"
+            ></Chat>
+          )}
         </div>
         {/* <div className="basis-1/4 flex bg-green-400 rounded-full">
           <ChatComponent />

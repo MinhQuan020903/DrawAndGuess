@@ -3,23 +3,26 @@
     "currentTurn": true,
     "nextTurn": false,
     "points": 10,
-    "LO": {
-      "Name": "Lee"
+    "detail": {
+      "avatar": "",
+      "username": "Lee"
     }
   },
   {
     "currentTurn": false,
     "nextTurn": true,
     "points": 50,
-    "LO": {
-      "Name": "Sean"
+    "detail": {
+      "avatar": "",
+      "username": "Lee"
     }
   },
   {
     "currentTurn": false,
     "nextTurn": false,
-    "LO": {
-      "Name": "Pascual"
+    "detail": {
+      "avatar": "",
+      "username": "Lee"
     },
     "points": 34
   },
@@ -27,24 +30,27 @@
     "currentTurn": false,
     "nextTurn": false,
     "points": 49,
-    "LO": {
-      "Name": "Brittany"
+    "detail": {
+      "avatar": "",
+      "username": "Lee"
     }
   },
   {
     "currentTurn": false,
     "nextTurn": false,
     "points": 30,
-    "LO": {
-      "Name": "Alex"
+    "detail": {
+      "avatar": "",
+      "username": "Lee"
     }
   },
   {
     "currentTurn": false,
     "nextTurn": false,
     "points": 25,
-    "LO": {
-      "Name": "Pax"
+    "detail": {
+      "avatar": "",
+      "username": "Lee"
     }
   },
   {
@@ -52,15 +58,17 @@
     "nextTurn": false,
     "points": 11,
 
-    "LO": {
-      "Name": "Tyler"
+    "detail": {
+      "avatar": "",
+      "username": "Lee"
     }
   },
   {
     "currentTurn": false,
     "nextTurn": false,
-    "LO": {
-      "Name": "Tim"
+    "detail": {
+      "avatar": "",
+      "username": "Lee"
     },
 
     "points": 54

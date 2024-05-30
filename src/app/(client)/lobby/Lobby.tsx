@@ -28,7 +28,6 @@ const Lobby = ({ session }) => {
   useEffect(() => {
     if (!session) return;
     const accessToken = session?.user?.access_token;
-    console.log('user12345 ===>' + JSON.stringify(session?.user));
 
     const newSocket = io(`${process.env.NEXT_PUBLIC_SOCKET_BASE_URL}/lobby`, {
       transports: ['websocket'],
