@@ -2,12 +2,12 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 
-export default function PlayHeader({ socket }) {
+export default function PlayHeader({ socket, user }) {
   const router = useRouter();
 
   const exitGame = () => {
     if (!socket) return;
-    socket.disconnect();
+    socket.emit('exit-room', { id: user.id });
     router.push('/');
   };
   return (

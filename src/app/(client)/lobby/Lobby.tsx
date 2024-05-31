@@ -9,6 +9,7 @@ interface Room {
   id: string;
   capacity: number;
   currentCapacity: number;
+  topic: string;
 }
 
 const Lobby = ({ session }) => {
@@ -54,6 +55,7 @@ const Lobby = ({ session }) => {
     });
 
     newSocket.on('rooms-list', (roomsList: string) => {
+      console.log('🚀 ~ newSocket.on ~ roomsList:', roomsList);
       setRooms(JSON.parse(roomsList));
     });
 
@@ -90,7 +92,11 @@ const Lobby = ({ session }) => {
     <div className="w-full h-full grid grid-cols-3 gap-3">
       {rooms.map((room: Room) => (
         <div key={room.id} className="bg-gray-300 p-3">
-          {room.id} - {room.currentCapacity}/{room.capacity}
+          <div>
+            {' '}
+            {room.id} - {room.currentCapacity}/{room.capacity}
+          </div>
+          <span>{room.topic}</span>
           <Button
             onClick={() => joinRoom(room.id)}
             disabled={room.currentCapacity === room.capacity}
