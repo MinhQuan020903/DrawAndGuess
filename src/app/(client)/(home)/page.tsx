@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { getSession } from '@/lib/auth';
 import { Button } from '@chakra-ui/react';
 import { signOut } from 'next-auth/react';
+import HostDialog from '../lobby/HostDialog';
 
 const HomePage = () => {
   const [session, setSession] = useState(null);
@@ -54,9 +55,6 @@ const HomePage = () => {
           <div>
             <h1>Welcome, {session.user?.username}</h1>
             <div className="flex flex-col gap-10 p-10">
-              <Button className="m-10 bg-orange-200" onClick={handleHost}>
-                Host
-              </Button>
               <Button className="m-10 bg-orange-200" onClick={handlePublic}>
                 Public
               </Button>

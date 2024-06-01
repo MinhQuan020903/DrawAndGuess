@@ -4,10 +4,13 @@ import React, { FC, useEffect, useState } from 'react';
 import Lobby from './Lobby';
 import { getSession } from '@/lib/auth';
 import Loader from '@/components/Loader';
+import HostDialog from './HostDialog';
+import { useRouter } from 'next/navigation';
 
 const Page: FC = () => {
   const [session, setSession] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const router = useRouter();
 
   useEffect(() => {
     const fetchSession = async () => {

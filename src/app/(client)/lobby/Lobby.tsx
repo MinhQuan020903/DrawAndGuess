@@ -4,6 +4,7 @@ import { Button } from '@chakra-ui/react';
 import { useRouter } from 'next/navigation';
 import React, { useEffect, useState, useCallback } from 'react';
 import { io, Socket } from 'socket.io-client';
+import HostDialog from './HostDialog';
 
 interface Room {
   id: string;
@@ -15,6 +16,7 @@ interface Room {
 const Lobby = ({ session }) => {
   const [socket, setSocket] = useState<Socket | null>(null);
   const [rooms, setRooms] = useState<Room[]>([]);
+  const [onCreateRoom, setOnCreateRoom] = useState(false);
   const router = useRouter();
 
   const joinRoom = useCallback(
@@ -67,6 +69,16 @@ const Lobby = ({ session }) => {
       alert(`Room ${roomId} is full`);
     });
 
+    if (onCreateRoom) {
+      newSocket.emit('create-room', {
+        user: session.user,
+        capacity: 10,
+        maxScore: 300,
+        topic: 'General Knowledge',
+      });
+      router.push('/game');
+    }
+
     setSocket(newSocket);
 
     // Cleanup function
@@ -89,22 +101,30 @@ const Lobby = ({ session }) => {
   }
 
   return (
-    <div className="w-full h-full grid grid-cols-3 gap-3">
-      {rooms.map((room: Room) => (
-        <div key={room.id} className="bg-gray-300 p-3">
-          <div>
-            {' '}
-            {room.id} - {room.currentCapacity}/{room.capacity}
+    <div className="w-full h-full flex flex-col gap-3">
+      {' '}
+      <HostDialog
+        user={session.user}
+        router={router}
+        socket={socket}
+      />
+      <div className="w-full h-full grid grid-cols-3 gap-3">
+        {rooms.map((room: Room) => (
+          <div key={room.id} className="bg-gray-300 p-3">
+            <div>
+              {' '}
+              {room.id} - {room.currentCapacity}/{room.capacity}
+            </div>
+            <span>{room.topic}</span>
+            <Button
+              onClick={() => joinRoom(room.id)}
+              disabled={room.currentCapacity === room.capacity}
+            >
+              Join Room
+            </Button>
           </div>
-          <span>{room.topic}</span>
-          <Button
-            onClick={() => joinRoom(room.id)}
-            disabled={room.currentCapacity === room.capacity}
-          >
-            Join Room
-          </Button>
-        </div>
-      ))}
+        ))}
+      </div>
     </div>
   );
 };
