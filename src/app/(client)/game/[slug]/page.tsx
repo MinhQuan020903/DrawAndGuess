@@ -28,6 +28,7 @@ export default function Page({ params }: { params: { slug: string } }) {
   const [maxScore, setMaxScore] = useState(0); // Max score
   const [isPlaying, setIsPlaying] = useState(false); // Game status [playing or not playing]
   const [isPlayer, setIsPlayer] = useState(false); // Player status [player or not player]
+  const [newGame, setNewGame] = useState(true); // New game [true or false]
 
   const totalTimer = 10000;
   const [timer, setTimer] = useState(totalTimer); // Timer [10 seconds]
@@ -99,6 +100,7 @@ export default function Page({ params }: { params: { slug: string } }) {
 
       //Start game
       const handleStartGame = (data: any) => {
+        setNewGame(false);
         setIsPlaying(true);
 
         console.log('Game Started', data);
@@ -180,6 +182,7 @@ export default function Page({ params }: { params: { slug: string } }) {
       } else {
         toast.info('Game Ended, The winner is: ' + data.detail.username);
       }
+      setNewGame(true);
     });
 
     return () => {
@@ -191,11 +194,12 @@ export default function Page({ params }: { params: { slug: string } }) {
 
   //Handle start game when click button
   const startGame = () => {
-    // if (players.length < 2) {
-    //   toast.error('You need at least 2 players to start the game!');
-    //   return;
-    // }
-    socket.emit('start-game');
+    if (players.length < 2) {
+      toast.error('You need at least 2 players to start the game!');
+      return;
+    }
+    console.log('Starting game..fsdafsdfaf.');
+    socket.emit('start-game', { newGame: newGame });
   };
 
   if (loading || !socket || !session) {
