@@ -30,8 +30,8 @@ export default function Page({ params }: { params: { slug: string } }) {
   const [isPlayer, setIsPlayer] = useState(false); // Player status [player or not player]
   const [newGame, setNewGame] = useState(true); // New game [true or false]
 
-  const totalTimer = 10000;
-  const [timer, setTimer] = useState(totalTimer); // Timer [10 seconds]
+  const totalTimer = 15000;
+  const [timer, setTimer] = useState(totalTimer); // Timer [15 seconds]
   const [players, setPlayers] = useState<Player[]>([]);
 
   const colors = {
@@ -90,7 +90,7 @@ export default function Page({ params }: { params: { slug: string } }) {
       socket.on('subscribed', handleSubscribed);
 
       //Get room detail
-      socket.emit('get-room-detail');
+      socket.emit('get-room-detail', { roomId: params.slug });
 
       socket.on('room-detail', (data) => {
         console.log('Room Detail', data);
@@ -118,7 +118,10 @@ export default function Page({ params }: { params: { slug: string } }) {
 
       if (isPlayer) {
         console.log('getting keyword...');
-        socket.emit('get-keyword', { userId: session?.user?.id });
+        socket.emit('get-keyword', {
+          roomId: params.slug,
+          userId: session?.user?.id,
+        });
       }
       socket.on('keyword', (data: any) => {
         console.log('Keyword Received', data);
@@ -168,7 +171,7 @@ export default function Page({ params }: { params: { slug: string } }) {
     if (timer === 0) {
       setIsPlaying(false);
 
-      if (isPlayer) socket.emit('end-game');
+      if (isPlayer) socket.emit('end-game', { roomId: params.slug });
 
       setIsPlayer(false);
     }
@@ -199,7 +202,7 @@ export default function Page({ params }: { params: { slug: string } }) {
       return;
     }
     console.log('Starting game..fsdafsdfaf.');
-    socket.emit('start-game', { newGame: newGame });
+    socket.emit('start-game', { roomId: params.slug, newGame: newGame });
   };
 
   if (loading || !socket || !session) {
@@ -209,7 +212,7 @@ export default function Page({ params }: { params: { slug: string } }) {
   return (
     <div className="flex flex-col gap-4 min-h-screen text-white p-24">
       <ToastContainer />
-      <PlayHeader socket={socket} user={session?.user} />
+      <PlayHeader socket={socket} user={session?.user} roomId={params.slug} />
       {/* Body */}
       <div className="flex flex-row grow gap-4">
         <div className="w-[25%] flex">

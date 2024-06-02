@@ -52,6 +52,7 @@ const Chat: FC<ChatProps> = ({ className, ...props }) => {
       if (guess !== '') {
         console.log('Guess: ', guess);
         props.socket.emit('send-guess', {
+          roomId: props.roomId,
           id: props.user.id,
           username: props.user.username,
           guess: guess,
