@@ -84,7 +84,7 @@ const CustomCanvas = (props: CanvasProps) => {
       const context = canvas.getContext('2d')!;
       context.clearRect(0, 0, canvas.width, canvas.height);
       props.setClear(false);
-      props.socket.emit('clear', true);
+      props.socket.emit('clear', { roomId: props.roomId });
     }
   }, [props.clear, props.socket, canvasRef]);
 
@@ -141,6 +141,7 @@ const CustomCanvas = (props: CanvasProps) => {
       setLastMouseY(posy);
 
       props.socket.emit('draw-line', {
+        roomId: props.roomId,
         prevPoint: { x: lastMouseX, y: lastMouseY },
         currentPoint: { x: posx, y: posy },
         color,

@@ -23,12 +23,15 @@ export default function Page({ params }: { params: { slug: string } }) {
   const [brushSize, setBrushSize] = useState(10);
 
   const [socket, setSocket] = useState<any>(null);
+  const [room, setRoom] = useState<any>(null); // Room
   const [keyword, setKeyword] = useState(''); // Game keyword
+  const [maxScore, setMaxScore] = useState(0); // Max score
   const [isPlaying, setIsPlaying] = useState(false); // Game status [playing or not playing]
   const [isPlayer, setIsPlayer] = useState(false); // Player status [player or not player]
+  const [newGame, setNewGame] = useState(true); // New game [true or false]
 
-  const totalTimer = 10000;
-  const [timer, setTimer] = useState(totalTimer); // Timer [10 seconds]
+  const totalTimer = 15000;
+  const [timer, setTimer] = useState(totalTimer); // Timer [15 seconds]
   const [players, setPlayers] = useState<Player[]>([]);
 
   const colors = {
@@ -69,60 +72,12 @@ export default function Page({ params }: { params: { slug: string } }) {
       });
       setSocket(newSocket);
     }
-  }, [session]);
-
-  //Get keyword
-  useEffect(() => {
-    if (socket) {
-      if (isPlayer) {
-        socket.emit('get-keyword', { userId: session?.user?.id });
-      }
-      socket.on('keyword', (data: any) => {
-        console.log('Keyword Received', data);
-        setKeyword(data.message);
-      });
-
-      return () => {
-        socket.off('get-keyword');
-        socket.off('keyword');
-      };
-    }
-  }, [isPlayer]);
-
-  //Check timer, if timer is 0, end game
-  useEffect(() => {
-    if (timer === 0) {
-      setIsPlaying(false);
-
-      if (isPlayer) socket.emit('end-game');
-
-      socket.on('drawer-score', (data) => {
-        console.log('🚀 ~ socket.on drawerscore~ data:', data);
-        setPlayers((prevPlayers: Player[]) => {
-          return prevPlayers.map((player) => {
-            if (player.id == data.userId) {
-              return {
-                ...player,
-                points: player.points + data.guessPoint,
-              };
-            }
-            return player;
-          });
-        });
-      });
-
-      setIsPlayer(false);
-
-      return () => {
-        socket.off('end-game');
-        socket.off('drawer-score');
-      };
-    }
-  }, [socket, timer]);
+  }, [session, socket]);
 
   //Start game
   useEffect(() => {
     if (socket) {
+      //Subscribe to room
       socket.emit('subscribe-room', {
         roomId: params.slug,
         user: session?.user,
@@ -134,21 +89,45 @@ export default function Page({ params }: { params: { slug: string } }) {
 
       socket.on('subscribed', handleSubscribed);
 
+      //Get room detail
+      socket.emit('get-room-detail', { roomId: params.slug });
+
+      socket.on('room-detail', (data) => {
+        console.log('Room Detail', data);
+        setRoom(data);
+        setMaxScore(data.maxScore);
+      });
+
+      //Start game
       const handleStartGame = (data: any) => {
+        setNewGame(false);
         setIsPlaying(true);
 
         console.log('Game Started', data);
 
+        //Check if you are the player
         if (data.userId === session?.user?.id) {
           setIsPlayer(true);
           console.log('You are the player!');
-          toast.success('Game Started, you are the player!');
         } else {
           setIsPlayer(false);
         }
       };
 
       socket.on('server-start-game', handleStartGame);
+
+      if (isPlayer) {
+        console.log('getting keyword...');
+        socket.emit('get-keyword', {
+          roomId: params.slug,
+          userId: session?.user?.id,
+        });
+      }
+      socket.on('keyword', (data: any) => {
+        console.log('Keyword Received', data);
+        setKeyword(data.message);
+        toast.info('You are the drawer! The keyword is: ' + data.message);
+      });
 
       socket.on('player-disconnect', (data) => {
         console.log('some player disconnected', data);
@@ -157,19 +136,73 @@ export default function Page({ params }: { params: { slug: string } }) {
 
       // Clean up event listeners
       return () => {
+        socket.off('subscribe-room');
         socket.off('subscribed', handleSubscribed);
         socket.off('player-disconnect');
         socket.off('server-start-game', handleStartGame);
+        socket.off('get-room-detail');
+        socket.off('room-detail');
+        socket.off('get-keyword');
+        socket.off('keyword');
       };
     }
-  }, [socket, session, params.slug]);
+  }, [socket, session, params.slug, isPlayer]);
 
+  //Check timer, if timer is 0, end game
+  useEffect(() => {
+    if (!socket) return;
+    const handleDrawerScore = (data) => {
+      console.log('🚀 ~ socket.on drawerscore~ data:', data);
+      setPlayers((prevPlayers: Player[]) => {
+        return prevPlayers.map((player) => {
+          if (player.id == data.userId) {
+            return {
+              ...player,
+              points: player.points + data.guessPoint,
+            };
+          }
+          return player;
+        });
+      });
+    };
+
+    socket.on('drawer-score', handleDrawerScore);
+
+    if (timer === 0) {
+      setIsPlaying(false);
+
+      if (isPlayer) socket.emit('end-game', { roomId: params.slug });
+
+      setIsPlayer(false);
+    }
+
+    //Listen to end game event (when there is a winner)
+    //(The winner is the player who reaches the maxScore first and has the highest score)
+    socket.on('found-winner', (data) => {
+      console.log('🚀 ~ socket.on found-winner~ data:', data);
+      if (data.id == session?.user?.id) {
+        toast.success('Congratulations, you are the winner!');
+      } else {
+        toast.info('Game Ended, The winner is: ' + data.detail.username);
+      }
+      setNewGame(true);
+    });
+
+    return () => {
+      socket.off('end-game');
+      socket.off('drawer-score', handleDrawerScore);
+      socket.off('found-winner');
+    };
+  }, [socket, timer]);
+
+  //Handle start game when click button
   const startGame = () => {
     if (players.length < 2) {
       toast.error('You need at least 2 players to start the game!');
       return;
     }
-    socket.emit('start-game');
+    console.log('Starting game..fsdafsdfaf.');
+    socket.emit('start-game', { roomId: params.slug, newGame: newGame });
   };
 
   if (loading || !socket || !session) {
@@ -179,7 +212,7 @@ export default function Page({ params }: { params: { slug: string } }) {
   return (
     <div className="flex flex-col gap-4 min-h-screen text-white p-24">
       <ToastContainer />
-      <PlayHeader socket={socket} />
+      <PlayHeader socket={socket} user={session?.user} roomId={params.slug} />
       {/* Body */}
       <div className="flex flex-row grow gap-4">
         <div className="w-[25%] flex">
