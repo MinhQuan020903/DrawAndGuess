@@ -83,7 +83,7 @@ const HostDialog = ({ user, router, socket }) => {
   return (
     <Dialog.Root>
       <Dialog.Trigger asChild>
-        <Button className="m-10 bg-orange-200">Host</Button>
+        <Button className="m-10 bg-orange-200">NEW ROOM</Button>
       </Dialog.Trigger>
       <Dialog.Portal>
         <Dialog.Overlay className="DialogOverlay" />
