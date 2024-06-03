@@ -93,14 +93,14 @@ const Register = ({ className }) => {
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)}>
             <div className="grid gap-6">
-              <div className="flex flex-col gap-3">
+              <div className="flex text-black flex-col gap-3">
                 <Label className=" self-start">Username</Label>
                 <FormField
                   control={form.control}
                   name="username"
                   render={({ field }) => (
                     <FormItem>
-                      <FormControl>
+                      <FormControl className="border-black border-2">
                         <Input placeholder="Username" {...field} />
                       </FormControl>
                       <FormMessage />
@@ -108,14 +108,14 @@ const Register = ({ className }) => {
                   )}
                 />
               </div>
-              <div className="flex flex-col gap-3">
+              <div className="flex text-black flex-col gap-3">
                 <Label className=" self-start">Password</Label>
                 <FormField
                   control={form.control}
                   name="password"
                   render={({ field }) => (
                     <FormItem>
-                      <FormControl>
+                      <FormControl className="border-black border-2">
                         <Input
                           type={show.showPass ? 'text' : 'password'}
                           placeholder="Password"
@@ -144,14 +144,14 @@ const Register = ({ className }) => {
                   )}
                 />
               </div>
-              <div className="flex flex-col gap-3">
+              <div className="flex text-black flex-col gap-3">
                 <Label className=" self-start">Confirm Password</Label>
                 <FormField
                   control={form.control}
                   name="confirmPassword"
                   render={({ field }) => (
                     <FormItem>
-                      <FormControl>
+                      <FormControl className="border-black border-2">
                         <Input
                           type={show.showConfirmPass ? 'text' : 'password'}
                           placeholder="Confirm Password"
@@ -180,14 +180,14 @@ const Register = ({ className }) => {
                   )}
                 />
               </div>
-              <div className="flex flex-col gap-3">
+              <div className="flex text-black flex-col gap-3">
                 <Label className=" self-start">Display Name</Label>
                 <FormField
                   control={form.control}
                   name="displayName"
                   render={({ field }) => (
                     <FormItem>
-                      <FormControl>
+                      <FormControl className="border-black border-2">
                         <Input placeholder="Display Name" {...field} />
                       </FormControl>
                       <FormMessage />
@@ -199,9 +199,9 @@ const Register = ({ className }) => {
             </div>
           </form>
         </Form>
-        <p className="mt-5 px-8 text-center text-sm text-white">
+        <p className="mt-5 px-8 text-center text-sm text-muted-foreground">
           Already have an account?{' '}
-          <Link className="font-bold underline text-white" href="/auth/login">
+          <Link className="font-bold underline text-black" href="/auth/login">
             Login
           </Link>
         </p>

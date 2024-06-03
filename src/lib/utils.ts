@@ -3,6 +3,12 @@ import { twMerge } from 'tailwind-merge';
 import numeral from 'numeral';
 import jwt from 'jsonwebtoken';
 import toast from 'react-hot-toast';
+import { useEffect, useState } from 'react';
+
+export interface MousePosition {
+  x: number;
+  y: number;
+}
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
@@ -45,7 +51,26 @@ export function isArrayOfFile(files: unknown): files is File[] {
 //     return out;
 //   }
 // };
+export function useMousePosition(): MousePosition {
+  const [mousePosition, setMousePosition] = useState<MousePosition>({
+    x: 0,
+    y: 0,
+  });
 
+  useEffect(() => {
+    const handleMouseMove = (event: MouseEvent) => {
+      setMousePosition({ x: event.clientX, y: event.clientY });
+    };
+
+    window.addEventListener('mousemove', handleMouseMove);
+
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+    };
+  }, []);
+
+  return mousePosition;
+}
 export const verifyJwt = (token: string) => {
   console.log(process.env.NEXT_PUBLIC_JWT_SECRET);
   let email = '';
