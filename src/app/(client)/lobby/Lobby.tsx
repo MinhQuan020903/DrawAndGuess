@@ -130,84 +130,87 @@ const Lobby = ({ session }) => {
     console.log('rooms', rooms);
   };
   return (
-    <div className="w-full h-[90vh] flex flex-col gap-3">
-      <div className="flex flex-row w-full  ">
-        <div className="flex flex-1  w-full flex-row gap-8 justify-between items-center content-center ">
-          <Button onClick={goBack} className=" w-1/6 flex m-3">
-            {CommonSvg.back()}
-          </Button>
-          <form className="flex justify-center w-5/6 h-8 rounded-md px-3">
-            <input
-              value={searchQuery || ''}
-              onChange={(event) => setSearchQuery(event.target.value)}
-              className="px-5 py-1 w-2/3 sm:px-5 sm:py-3 flex-1 text-zinc-800 bg-zinc-100 focus:bg-white rounded-full focus:outline-none focus:ring-[1px] focus:ring-black placeholder:text-zinc-400"
-              placeholder="search"
+    <div className="h-4/5 w-4/5 bg-slate-300 relative z-10">
+      <div className="w-full h-[90vh] flex flex-col gap-3">
+        <div className="flex flex-row w-full  ">
+          <div className="flex flex-1  w-full flex-row gap-8 justify-between items-center content-center ">
+            <Button onClick={goBack} className=" w-1/6 flex m-3">
+              {CommonSvg.back()}
+            </Button>
+            <form className="flex justify-center w-5/6 h-8 rounded-md px-3">
+              <input
+                value={searchQuery || ''}
+                onChange={(event) => setSearchQuery(event.target.value)}
+                className="px-5 py-1 w-2/3 sm:px-5 sm:py-3 flex-1 text-zinc-800 bg-zinc-100 focus:bg-white rounded-full focus:outline-none focus:ring-[1px] focus:ring-black placeholder:text-zinc-400"
+                placeholder="search"
+              />
+            </form>
+          </div>
+          <div className="flex flex-1  w-full flex-row gap-8 justify-center items-center content-center ">
+            <Image
+              src="/title.png"
+              alt="Draw and Guess"
+              width={300}
+              height={50}
             />
-          </form>
+          </div>
+          <div className="flex flex-1 self-end w-full flex-row justify-center items-center content-center "></div>
         </div>
-        <div className="flex flex-1  w-full flex-row gap-8 justify-center items-center content-center ">
-          <Image
-            src="/title.png"
-            alt="Draw and Guess"
-            width={300}
-            height={50}
-          />
-        </div>
-        <div className="flex flex-1 self-end w-full flex-row justify-center items-center content-center "></div>
-      </div>
-      <div className="grid grid-cols-2 gap-3 p-3 w-1/2 self-center">
-        <HostDialog user={session.user} router={router} socket={socket} />
 
-        <Button
-          className="self-center"
-          onClick={() => {
-            const id = getRandomAvailableRoomId(rooms);
-            joinRoom(id);
-          }}
-        >
-          JOIN RANDOM
-        </Button>
-      </div>
-      <div className="w-full h-2/3 overflow-y-auto grid grid-cols-4 gap-3 rounded-lg bg-slate-500 p-3">
-        {rooms.map((room: Room) => (
-          <Card
-            aria-disabled={room.currentCapacity === room.capacity}
-            key={room.id}
-            className="h-full overflow-hidden rounded-sm bg-gray-300 p-3 shadow-md"
-          >
-            <div
-              onClick={() => joinRoom(room.id)}
-              className="flex flex-col items-center justify-center"
+        <div className="w-full h-2/3 overflow-y-auto grid grid-cols-4 gap-3 rounded-lg bg-slate-500 p-3">
+          {rooms.map((room: Room) => (
+            <Card
+              aria-disabled={room.currentCapacity === room.capacity}
+              key={room.id}
+              className="h-full overflow-hidden rounded-sm bg-gray-300 p-3 shadow-md"
             >
-              <Avatar
-                mr={2}
-                src={room.illustrationUrl}
-                size="lg"
-                className=" w-8 h-8 bg-slate-300"
-              ></Avatar>
-              <span>
-                {room.topic} {'/#id: '} {room.id}
-              </span>
-              <div className="grid grid-cols-3 gap-3 p-3 w-full h-full items-center justify-center content-center ">
-                <div className="flex flex-1 justify-center items-center">
-                  <CiUser className="text-blue-500 mr-2" size={20} />
-                  {room.currentCapacity}/{room.capacity}
-                </div>
-                <div className="flex flex-1 justify-center items-center">
-                  <IoChatbubbleOutline
-                    className="text-blue-500 mr-2"
-                    size={20}
-                  />
-                  EN
-                </div>
-                <div className="flex flex-1 justify-center items-center">
-                  <TfiCup className="text-blue-500 mr-2" size={20} />
-                  {100}/{1000}
+              <div
+                onClick={() => joinRoom(room.id)}
+                className="flex flex-col items-center justify-center"
+              >
+                <Avatar
+                  mr={2}
+                  src={room.illustrationUrl}
+                  size="lg"
+                  className=" w-8 h-8 bg-slate-300"
+                ></Avatar>
+                <span>
+                  {room.topic} {'/#id: '} {room.id}
+                </span>
+                <div className="grid grid-cols-3 gap-3 p-3 w-full h-full items-center justify-center content-center ">
+                  <div className="flex flex-1 justify-center items-center">
+                    <CiUser className="text-blue-500 mr-2" size={20} />
+                    {room.currentCapacity}/{room.capacity}
+                  </div>
+                  <div className="flex flex-1 justify-center items-center">
+                    <IoChatbubbleOutline
+                      className="text-blue-500 mr-2"
+                      size={20}
+                    />
+                    EN
+                  </div>
+                  <div className="flex flex-1 justify-center items-center">
+                    <TfiCup className="text-blue-500 mr-2" size={20} />
+                    {100}/{1000}
+                  </div>
                 </div>
               </div>
-            </div>
-          </Card>
-        ))}
+            </Card>
+          ))}
+        </div>
+        <div className="grid grid-cols-2 gap-3 p-3 w-1/2 self-center">
+          <HostDialog user={session.user} router={router} socket={socket} />
+
+          <Button
+            className="self-center"
+            onClick={() => {
+              const id = getRandomAvailableRoomId(rooms);
+              joinRoom(id);
+            }}
+          >
+            JOIN RANDOM
+          </Button>
+        </div>
       </div>
     </div>
   );

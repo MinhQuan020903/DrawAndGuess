@@ -53,9 +53,7 @@ const Page: FC = () => {
           </div>
         </div>
       </div>
-      <div className="h-4/5 w-4/5 bg-slate-300 relative z-10">
-        <Lobby session={session} />
-      </div>
+      <Lobby session={session} />
     </div>
   );
 };

@@ -80,14 +80,15 @@ const HostDialog = ({ user, router, socket }) => {
   };
 
   if (!topics) return <Loader />;
+
   return (
     <Dialog.Root>
       <Dialog.Trigger asChild>
         <Button className="m-10 bg-orange-200">NEW ROOM</Button>
       </Dialog.Trigger>
       <Dialog.Portal>
-        <Dialog.Overlay className="DialogOverlay" />
-        <Dialog.Content className="DialogContent">
+        <Dialog.Overlay className="DialogOverlay fixed inset-0 bg-black bg-opacity-50 z-40" />
+        <Dialog.Content className="DialogContent fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white p-6 rounded-lg shadow-lg z-50">
           <form onSubmit={handleSubmit(onSubmit)}>
             <Dialog.Title className="DialogTitle">Host Room</Dialog.Title>
             <Dialog.Description className="DialogDescription">
@@ -121,7 +122,6 @@ const HostDialog = ({ user, router, socket }) => {
             {errors.maxScore && (
               <p className="text-red-500">{errors.maxScore.message}</p>
             )}
-
             <label className="Label" htmlFor="selectedTopic">
               Topic
             </label>
