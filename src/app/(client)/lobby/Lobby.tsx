@@ -46,6 +46,9 @@ import { Spinner } from '@nextui-org/react';
 import { AiOutlineFilter } from 'react-icons/ai';
 import Friend from './Friend';
 import { set } from 'zod';
+
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 interface Room {
   id: string;
   capacity: number;
@@ -157,6 +160,54 @@ const Lobby = ({ session }) => {
 
     setUserSocket(newUserSocket);
 
+    if (newUserSocket) {
+      newUserSocket.on('invite-friend-to-room', (data) => {
+        if (data.receiver == session.user.username) {
+          toast.info(
+            <div className="w-full h-full flex flex-row justify-evenly">
+              <span>
+                {data.sender} invited you to join room {data.roomId}
+              </span>
+              <Button
+                onClick={() => {
+                  newUserSocket.emit('response-invite-friend-to-room', {
+                    sender: data.sender,
+                    receiver: data.receiver,
+                    roomId: data.roomId,
+                    accept: true,
+                  });
+                  router.push(`/game/${data.roomId}`);
+                }}
+              >
+                Accept
+              </Button>
+              <Button
+                onClick={() => {
+                  newUserSocket.emit('response-invite-friend-to-room', {
+                    sender: data.sender,
+                    receiver: data.receiver,
+                    roomId: data.roomId,
+                    accept: false,
+                  });
+                }}
+              >
+                Reject
+              </Button>
+            </div>,
+            {
+              position: 'bottom-right',
+              autoClose: 5000,
+              hideProgressBar: false,
+              closeOnClick: true,
+              pauseOnHover: true,
+              draggable: true,
+              progress: undefined,
+            }
+          );
+        }
+      });
+    }
+
     // Cleanup function
     return () => {
       if (newSocket) {
@@ -186,6 +237,7 @@ const Lobby = ({ session }) => {
   };
   return (
     <div className="h-4/5 w-4/5 bg-slate-300 relative z-10">
+      <ToastContainer />
       <div className="w-full h-[90vh] flex flex-col gap-3">
         <div className="flex flex-row w-full  ">
           <div className="flex flex-1  w-full flex-row gap-8 justify-between items-center content-center ">

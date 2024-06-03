@@ -14,6 +14,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Timer from '../Timer';
 import { Player } from '@/types/types';
+import InviteFriendDialog from '../InviteFriendDialog';
 
 export default function Page({ params }: { params: { slug: string } }) {
   const [color, setColor] = useState('#000000'); // Brush color
@@ -23,6 +24,7 @@ export default function Page({ params }: { params: { slug: string } }) {
   const [brushSize, setBrushSize] = useState(10);
 
   const [socket, setSocket] = useState<any>(null);
+  const [userSocket, setUserSocket] = useState<any>(null);
   const [room, setRoom] = useState<any>(null); // Room
   const [keyword, setKeyword] = useState(''); // Game keyword
   const [maxScore, setMaxScore] = useState(0); // Max score
@@ -33,6 +35,8 @@ export default function Page({ params }: { params: { slug: string } }) {
   const totalTimer = 15000;
   const [timer, setTimer] = useState(totalTimer); // Timer [15 seconds]
   const [players, setPlayers] = useState<Player[]>([]);
+
+  const [friends, setFriends] = useState([]);
 
   const colors = {
     black: '#000000',
@@ -70,13 +74,23 @@ export default function Page({ params }: { params: { slug: string } }) {
           token: accessToken,
         },
       });
+      const newUserSocket = io(
+        `${process.env.NEXT_PUBLIC_SOCKET_BASE_URL}/user`,
+        {
+          transports: ['websocket'],
+          query: {
+            token: accessToken,
+          },
+        }
+      );
       setSocket(newSocket);
+      setUserSocket(newUserSocket);
     }
   }, [session, socket]);
 
   //Start game
   useEffect(() => {
-    if (socket) {
+    if (socket && userSocket) {
       //Subscribe to room
       socket.emit('subscribe-room', {
         roomId: params.slug,
@@ -144,9 +158,39 @@ export default function Page({ params }: { params: { slug: string } }) {
         socket.off('room-detail');
         socket.off('get-keyword');
         socket.off('keyword');
+        socket.off('player-disconnect');
+        userSocket.off('new-user');
+        userSocket.off('friends');
+        userSocket.off('response-invite-friend-to-room');
       };
     }
   }, [socket, session, params.slug, isPlayer]);
+
+  useEffect(() => {
+    if (!userSocket) return;
+    userSocket.on('connect', () => {
+      console.log('Connected to server');
+      userSocket.emit('subscribe-user', { user: session?.user });
+    });
+
+    userSocket.on('new-user', () => {
+      userSocket.emit('get-friends', { username: session.user.username });
+    });
+
+    userSocket.on('friends', (data) => {
+      console.log('friends', data);
+      setFriends(data);
+    });
+
+    userSocket.on('response-invite-friend-to-room', (data) => {
+      console.log('response-invite-friend-to-room', data);
+      if (data.accept && data.sender == session.user.username) {
+        toast.success(data.receiver + ' accepted your invitation');
+      } else if (!data.accept && data.sender == session.user.username) {
+        toast.error(data.receiver + ' rejected your invitation');
+      }
+    });
+  }, [userSocket, session]);
 
   //Check timer, if timer is 0, end game
   useEffect(() => {
@@ -332,15 +376,26 @@ export default function Page({ params }: { params: { slug: string } }) {
             )}
 
             {!isPlaying && (
-              <button
-                onClick={() => {
-                  startGame();
-                }}
-              >
-                <div className="color-square w-16 h-16 p-2 rounded-lg border-1 bg-yellow-400 border-white items-center justify-center flex">
-                  Play
-                </div>
-              </button>
+              <div className="w-full h-fit flex flex-row justify-between">
+                {' '}
+                <InviteFriendDialog
+                  username={session.user.username}
+                  friends={friends}
+                  roomId={params.slug}
+                  players={players}
+                  isOnline={true}
+                  userSocket={userSocket}
+                ></InviteFriendDialog>
+                <button
+                  onClick={() => {
+                    startGame();
+                  }}
+                >
+                  <div className="color-square w-16 h-16 p-2 rounded-lg border-1 bg-yellow-400 border-white items-center justify-center flex">
+                    Play
+                  </div>
+                </button>
+              </div>
             )}
           </div>
         </div>
