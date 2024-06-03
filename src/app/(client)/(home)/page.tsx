@@ -48,9 +48,9 @@ const HomePage = () => {
   }
 
   return (
-    <div className="dark min-h-screen text-center items-center justify-center flex flex-col text-white">
-      <div className="h-4/5 w-4/5 bg-gray-700">
-        <h1 className="text-2xl">Draw and Guess</h1>
+    <div className="relative min-h-screen text-center items-center justify-center flex flex-col text-white">
+      <div className="h-4/5 w-4/5 bg-slate-300 relative z-10">
+        <h1 className="text-2xl text-orange-400">Draw and Guess</h1>
         {session?.user ? (
           <div>
             <h1>Welcome, {session.user?.username}</h1>
@@ -69,6 +69,16 @@ const HomePage = () => {
                   value={roomCode}
                   onChange={(e) => setRoomCode(e.target.value)}
                 />
+                <form id="formCode" className="flex">
+                  <input
+                    id="codeLinkInput"
+                    className="flex-1"
+                    type="text"
+                    autoComplete="off"
+                    placeholder="paste the link here"
+                  />
+                  <button type="submit">generate</button>
+                </form>
               </div>
               <Button
                 onClick={() => signOut({ callbackUrl: '/' })}

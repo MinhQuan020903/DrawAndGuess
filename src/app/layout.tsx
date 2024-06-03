@@ -4,6 +4,7 @@ import './globals.css';
 import { ChakraProvider } from '@chakra-ui/react';
 import AppBgImg from './AppBgImg';
 import AuthProvider from '../../context/AuthProvider';
+
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
@@ -22,6 +23,7 @@ export default function RootLayout({
         <AuthProvider>
           <ChakraProvider>
             <AppBgImg />
+
             {children}
           </ChakraProvider>
         </AuthProvider>

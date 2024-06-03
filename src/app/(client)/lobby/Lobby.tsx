@@ -5,6 +5,9 @@ import { useRouter } from 'next/navigation';
 import React, { useEffect, useState, useCallback } from 'react';
 import { io, Socket } from 'socket.io-client';
 import HostDialog from './HostDialog';
+import { Avatar } from '@chakra-ui/react';
+import Image from 'next/image';
+import { useDebounce } from '@/hooks/useDebounce';
 
 interface Room {
   id: string;
@@ -18,7 +21,14 @@ const Lobby = ({ session }) => {
   const [rooms, setRooms] = useState<Room[]>([]);
   const [onCreateRoom, setOnCreateRoom] = useState(false);
   const router = useRouter();
+  const [searchQuery, setSearchQuery] = useState('');
+  const debouncedSearch = useDebounce(searchQuery, 500);
 
+  React.useEffect(() => {
+    const encodedSearchQuery = encodeURI(debouncedSearch);
+
+    // refetchData();
+  }, [debouncedSearch]);
   const joinRoom = useCallback(
     (roomId: string) => {
       if (socket) {
@@ -99,15 +109,35 @@ const Lobby = ({ session }) => {
   if (!session) {
     return <div>Loading...</div>; // or any loading indicator
   }
-
+  const goBack = () => {
+    router.push('/');
+  };
   return (
     <div className="w-full h-full flex flex-col gap-3">
-      {' '}
-      <HostDialog
-        user={session.user}
-        router={router}
-        socket={socket}
-      />
+      <div className="flex flex-row w-full justify-between space-x-52 ">
+        <div className="flex flex-1  w-full flex-row gap-8 justify-center items-center content-center">
+          <Button onClick={goBack} className="bg-orange-200">
+            Back
+          </Button>
+          <form className="flex justify-center w-5/6 h-8 rounded-md px-3">
+            <input
+              value={searchQuery || ''}
+              onChange={(event) => setSearchQuery(event.target.value)}
+              className="px-5 py-1 w-2/3 sm:px-5 sm:py-3 flex-1 text-zinc-800 bg-zinc-100 focus:bg-white rounded-full focus:outline-none focus:ring-[1px] focus:ring-black placeholder:text-zinc-400"
+              placeholder="search"
+            />
+          </form>
+        </div>
+        <div className="flex flex-1  w-full flex-row gap-8 justify-center items-center content-center">
+          <Image
+            src="/title.png"
+            alt="Draw and Guess"
+            width={400}
+            height={50}
+          />
+        </div>
+        <div className="flex flex-1 self-end w-full flex-row justify-center items-center content-center "></div>
+      </div>
       <div className="w-full h-full grid grid-cols-3 gap-3">
         {rooms.map((room: Room) => (
           <div key={room.id} className="bg-gray-300 p-3">
@@ -124,7 +154,8 @@ const Lobby = ({ session }) => {
             </Button>
           </div>
         ))}
-      </div>
+      </div>{' '}
+      <HostDialog user={session.user} router={router} socket={socket} />
     </div>
   );
 };

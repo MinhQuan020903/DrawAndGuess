@@ -8,7 +8,7 @@ export async function mustBeLoggedIn() {
   const session = await getServerSession(options);
   console.log('session: ', session);
   if (!session || !session?.user.display_name) {
-    redirect('/');
+    redirect('/auth/login');
   }
 }
 export async function getSession() {

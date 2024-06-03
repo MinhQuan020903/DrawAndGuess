@@ -88,29 +88,29 @@ const Login = ({ className }: { className?: string; providers: unknown }) => {
               <form onSubmit={form.handleSubmit(onSubmit)}>
                 <div className="grid gap-6">
                   <div className="gap-8 flex flex-col">
-                    <div className="flex flex-col gap-3 ">
+                    <div className="flex flex-col gap-3 text-black ">
                       <Label className=" self-start">Tài khoản</Label>
                       <FormField
                         control={form.control}
                         name="username"
                         render={({ field }) => (
                           <FormItem>
-                            <FormControl>
-                              <Input placeholder="tran_van_a" {...field} />
+                            <FormControl className="border-black border-2">
+                              <Input placeholder="minh_quan" {...field} />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
                         )}
                       />
                     </div>
-                    <div className="flex flex-col gap-3 ">
+                    <div className="flex flex-col gap-3 text-black ">
                       <Label className=" self-start">Mật khẩu</Label>
                       <FormField
                         control={form.control}
                         name="password"
                         render={({ field }) => (
                           <FormItem>
-                            <FormControl>
+                            <FormControl className="border-black border-2">
                               <Input
                                 renderRight={
                                   <div
@@ -132,7 +132,7 @@ const Login = ({ className }: { className?: string; providers: unknown }) => {
                                 value={field.value}
                                 onChange={field.onChange}
                                 id="password"
-                                placeholder="password"
+                                placeholder="quan2003"
                                 type={show.showPass ? 'text' : 'password'}
                                 autoCapitalize="none"
                                 autoComplete="password"
@@ -152,10 +152,10 @@ const Login = ({ className }: { className?: string; providers: unknown }) => {
             </Form>
           </div>
 
-          <p className="mt-5 px-8 text-center text-sm text-white">
+          <p className="mt-5 px-8 text-center text-sm text-muted-foreground">
             Chưa có tài khoản?{' '}
             <Link
-              className="font-bold underline text-white"
+              className="font-bold underline text-black"
               href="/auth/register"
             >
               Đăng ký
