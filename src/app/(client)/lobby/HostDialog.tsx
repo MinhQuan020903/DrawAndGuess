@@ -84,7 +84,7 @@ const HostDialog = ({ user, router, socket }) => {
   return (
     <Dialog.Root>
       <Dialog.Trigger asChild>
-        <Button className="m-10 bg-orange-200">NEW ROOM</Button>
+        <Button className="m-10 bg-blue-500">NEW ROOM</Button>
       </Dialog.Trigger>
       <Dialog.Portal>
         <Dialog.Overlay className="DialogOverlay fixed inset-0 bg-black bg-opacity-50 z-40" />
