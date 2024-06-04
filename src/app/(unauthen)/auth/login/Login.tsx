@@ -2,7 +2,6 @@
 
 import * as React from 'react';
 import { cn } from '@/lib/utils';
-import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { signIn } from 'next-auth/react';
@@ -21,6 +20,8 @@ import {
 } from '@/components/ui/form';
 import * as z from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
+import DialogCustom from '@/components/DialogCustom';
+import { Button, Spinner } from '@chakra-ui/react';
 
 const formSchema = z.object({
   username: z.string().min(1, {
@@ -70,9 +71,21 @@ const Login = ({ className }: { className?: string; providers: unknown }) => {
   }
   if (isLoading)
     return (
-      <div className="w-full flex flex-col items-center justify-center">
-        <Loader />
-      </div>
+      <DialogCustom
+        className="w-[90%] lg:w-[50%] h-fit items-center justify-center rounded-lg"
+        isModalOpen={isLoading}
+        notShowClose={true}
+      >
+        <div className="flex flex-col gap-3 items-center justify-center">
+          <Spinner
+            className="w-full h-full flex justify-center items-center"
+            color="cyan"
+          />
+          <div className="text-center font-semibold text-xs sm:text-sm text-blue-300">
+            Loading
+          </div>
+        </div>
+      </DialogCustom>
     );
   return (
     <div className="flex flex-row grow gap-4">
@@ -80,7 +93,7 @@ const Login = ({ className }: { className?: string; providers: unknown }) => {
         <div className="w-full flex flex-col items-center justify-center">
           <div
             className={cn(
-              'grid gap-6 w-[80%] md:w-[70%] lg:w-[60%] ',
+              'grid gap-6 w-[80%] md:w-[70%] lg:w-[60%]',
               className
             )}
           >
@@ -89,7 +102,7 @@ const Login = ({ className }: { className?: string; providers: unknown }) => {
                 <div className="grid gap-6">
                   <div className="gap-8 flex flex-col">
                     <div className="flex flex-col gap-3 text-black ">
-                      <Label className=" self-start">Tài khoản</Label>
+                      <Label className=" self-start">Username</Label>
                       <FormField
                         control={form.control}
                         name="username"
@@ -104,7 +117,7 @@ const Login = ({ className }: { className?: string; providers: unknown }) => {
                       />
                     </div>
                     <div className="flex flex-col gap-3 text-black ">
-                      <Label className=" self-start">Mật khẩu</Label>
+                      <Label className=" self-start">Password</Label>
                       <FormField
                         control={form.control}
                         name="password"
@@ -146,19 +159,33 @@ const Login = ({ className }: { className?: string; providers: unknown }) => {
                     </div>
                   </div>
 
-                  <Button type="submit">Đăng nhập</Button>
+                  <Button
+                    shadow={'outline'}
+                    dropShadow={'outline'}
+                    bgColor={'blue.600'}
+                    fontWeight={'bold'}
+                    rounded={'xl'}
+                    _hover={{
+                      borderColor: 'slate.300',
+                      bgColor: 'blue.500',
+                    }}
+                    textColor={'white'}
+                    type="submit"
+                  >
+                    Sign In
+                  </Button>
                 </div>
               </form>
             </Form>
           </div>
 
           <p className="mt-5 px-8 text-center text-sm text-muted-foreground">
-            Chưa có tài khoản?{' '}
+            Dont have an account yet?{' '}
             <Link
               className="font-bold underline text-black"
               href="/auth/register"
             >
-              Đăng ký
+              Register
             </Link>
           </p>
           <div className="h-10"></div>

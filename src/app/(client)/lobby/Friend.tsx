@@ -18,6 +18,7 @@ import {
 import { ScrollArea } from '@/components/ui/scroll-area';
 import UserOnlineStatusCard from './UserOnlineStatus';
 import FriendRequestCard from './FriendRequestCard';
+import { FiUsers } from 'react-icons/fi';
 
 const Friend = ({ userSocket, user }) => {
   const [users, setUsers] = useState([]);
@@ -92,11 +93,20 @@ const Friend = ({ userSocket, user }) => {
         <Sheet>
           <SheetTrigger asChild>
             <Button
-              aria-label="Filter products"
+              dropShadow={'outline'}
+              bgColor={'blue.600'}
+              rounded={'xl'}
+              leftIcon={<FiUsers />}
+              _hover={{
+                boxShadow: 'outline',
+                shadow: 'outline',
+                bgColor: 'blue.500',
+              }}
+              textColor={'white'}
               className="z-50 rounded-full justify-between items-center content-center bg-white shadow-md hover:shadow-lg"
             >
               <div className="transform duration-200 hover:scale-105 flex items-center justify-center cursor-pointer">
-                Friends List
+                Friends
               </div>
             </Button>
           </SheetTrigger>

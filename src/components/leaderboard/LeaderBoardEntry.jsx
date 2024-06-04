@@ -65,9 +65,9 @@ const LeaderBoardEntry = ({ row }) => {
                 <Flex flexDir={'column'}>
                   <Text
                     fontWeight={
-                      newRow.points == oldRow.points ? 'normal' : 'semibold'
+                      newRow.points == oldRow.points ? 'normal' : 'bold'
                     }
-                    fontSize="sm"
+                    fontSize="md"
                     color={'black'}
                   >
                     {row.detail.username}
@@ -75,9 +75,9 @@ const LeaderBoardEntry = ({ row }) => {
                   <Text
                     as="em"
                     color={'blue.600'}
-                    fontSize="xs"
+                    fontSize="sm"
                     fontWeight={
-                      newRow.points == oldRow.points ? 'normal' : 'extrabold'
+                      newRow.points == oldRow.points ? 'bold' : 'extrabold'
                     }
                   >
                     <CountUp

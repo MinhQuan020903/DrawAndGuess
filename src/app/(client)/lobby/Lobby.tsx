@@ -1,6 +1,13 @@
 'use client';
 import { getSession } from '@/lib/auth';
-import { Button } from '@chakra-ui/react';
+import {
+  Box,
+  Button,
+  Input,
+  InputGroup,
+  InputLeftElement,
+  Spinner,
+} from '@chakra-ui/react';
 import { useRouter } from 'next/navigation';
 import React, { useEffect, useState, useCallback } from 'react';
 import { io, Socket } from 'socket.io-client';
@@ -14,41 +21,14 @@ import { Card } from '@/components/ui/card';
 import { CiUser } from 'react-icons/ci';
 import { IoChatbubbleOutline } from 'react-icons/io5';
 import { TfiCup } from 'react-icons/tfi';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { Input } from '@/components/ui/input';
-import { Separator } from '@/components/ui/separator';
-import {
-  Sheet,
-  SheetContent,
-  SheetFooter,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from '@/components/ui/sheet';
-import { Slider } from '@/components/ui/slider';
-import { ChevronDownIcon } from '@radix-ui/react-icons';
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from '@/components/ui/accordion';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { Checkbox } from '@nextui-org/react';
-import { Spinner } from '@nextui-org/react';
-import { AiOutlineFilter } from 'react-icons/ai';
 import Friend from './Friend';
 import { set } from 'zod';
 
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import DialogCustom from '@/components/DialogCustom';
+import { FaSearch } from 'react-icons/fa';
+import * as ScrollArea from '@radix-ui/react-scroll-area';
 interface Room {
   id: string;
   capacity: number;
@@ -65,6 +45,7 @@ const Lobby = ({ session }) => {
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState('');
   const debouncedSearch = useDebounce(searchQuery, 500);
+
   const getRandomAvailableRoomId = (rooms: Room[]): string | null => {
     const availableRooms = rooms.filter(
       (room) => room.currentCapacity < room.capacity
@@ -228,94 +209,180 @@ const Lobby = ({ session }) => {
     };
   }, [session, router]);
 
-  if (!session) {
-    return <div>Loading...</div>; // or any loading indicator
+  const [isLoadingRoom, setIsLoadingRoom] = useState(false);
+
+  if (!session || isLoadingRoom) {
+    return (
+      <DialogCustom
+        className="w-[90%] lg:w-[50%] h-fit items-center justify-center rounded-lg"
+        isModalOpen={!session || isLoadingRoom}
+        notShowClose={true}
+      >
+        <div className="flex flex-col gap-3 items-center justify-center">
+          <Spinner
+            className="w-full h-full flex justify-center items-center"
+            color="cyan"
+          />
+          <div className="text-center font-semibold text-xs sm:text-sm text-blue-300">
+            Loading
+          </div>
+        </div>
+      </DialogCustom>
+    ); // or any loading indicator
   }
   const goBack = () => {
     router.push('/');
     // console.log('rooms', rooms);
   };
   return (
-    <div className="h-4/5 w-4/5 bg-slate-300 relative z-10">
+    <div className=" w-4/5 bg-white border-yellow-400 border-4 relative z-10 rounded-3xl p-5 shadow-inner drop-shadow-3xl">
       <ToastContainer />
-      <div className="w-full h-[90vh] flex flex-col gap-3">
-        <div className="flex flex-row w-full  ">
-          <div className="flex flex-1  w-full flex-row gap-8 justify-between items-center content-center ">
-            <Button onClick={goBack} className=" w-1/6 flex m-3">
+      <div className="w-full h-auto flex flex-col gap-3">
+        <div className="flex flex-row w-full h-20 items-center justify-center px-8">
+          <div className="flex flex-1 w-full flex-row gap-8 justify-between items-center content-center ">
+            <Button
+              dropShadow={'outline'}
+              bgColor={'blue.600'}
+              rounded={'xl'}
+              _hover={{
+                boxShadow: 'outline',
+                shadow: 'outline',
+                bgColor: 'blue.500',
+              }}
+              className="px-4 py-1"
+              onClick={goBack}
+            >
               {CommonSvg.back()}
             </Button>
-            <form className="flex justify-center w-5/6 h-8 rounded-md px-3">
-              <input
-                value={searchQuery || ''}
-                onChange={(event) => setSearchQuery(event.target.value)}
-                className="px-5 py-1 w-2/3 sm:px-5 sm:py-3 flex-1 text-zinc-800 bg-zinc-100 focus:bg-white rounded-full focus:outline-none focus:ring-[1px] focus:ring-black placeholder:text-zinc-400"
-                placeholder="search"
-              />
+            <form className="h-full items-center justify-center w-5/6 rounded-md">
+              <InputGroup>
+                <InputLeftElement
+                  h="100%"
+                  pointerEvents="none"
+                  display="flex"
+                  alignItems="center"
+                  justifyContent="center"
+                >
+                  <FaSearch color="gray" />
+                </InputLeftElement>
+                <Input
+                  size={'lg'}
+                  shadow={'sm'}
+                  value={searchQuery || ''}
+                  onChange={(event) => setSearchQuery(event.target.value)}
+                  className="h-full px-5 w-2/3 sm:px-5 flex-1 text-zinc-800 bg-zinc-100 focus:bg-white rounded-full focus:outline-none focus:ring-[1px] focus:ring-black placeholder:text-zinc-400"
+                  placeholder="Search room..."
+                ></Input>
+              </InputGroup>
             </form>
           </div>
           <div className="flex flex-1  w-full flex-row gap-8 justify-center items-center content-center ">
-            <Image
-              src="/title.png"
-              alt="Draw and Guess"
-              width={300}
-              height={50}
-            />
+            <span className="text-7xl font-bold text-yellow-400 font-dotGothic16">
+              LOBBY
+            </span>
           </div>
           <Friend user={session.user} userSocket={userSocket}></Friend>
         </div>
 
-        <div className="w-full h-2/3 overflow-y-auto grid grid-cols-4 gap-3 rounded-lg bg-slate-500 p-3">
-          {rooms.map((room: Room) => (
-            <Card
-              aria-disabled={room.currentCapacity === room.capacity}
-              key={room.id}
-              className="h-full overflow-hidden rounded-sm bg-gray-300 p-3 shadow-md"
-            >
-              <div
-                onClick={() => joinRoom(room.id)}
-                className="flex flex-col items-center justify-center"
-              >
-                <Avatar
-                  mr={2}
-                  src={room.illustrationUrl}
-                  size="lg"
-                  className=" w-8 h-8 bg-slate-300"
-                ></Avatar>
-                <span>
-                  {room.topic} {'/#id: '} {room.id}
-                </span>
-                <div className="grid grid-cols-3 gap-3 p-3 w-full h-full items-center justify-center content-center ">
-                  <div className="flex flex-1 justify-center items-center">
-                    <CiUser className="text-blue-500 mr-2" size={20} />
-                    {room.currentCapacity}/{room.capacity}
-                  </div>
-                  <div className="flex flex-1 justify-center items-center">
-                    <IoChatbubbleOutline
-                      className="text-blue-500 mr-2"
-                      size={20}
-                    />
-                    EN
-                  </div>
-                  <div className="flex flex-1 justify-center items-center">
-                    <TfiCup className="text-blue-500 mr-2" size={20} />
-                    {100}/{1000}
-                  </div>
-                </div>
+        <ScrollArea.Root className="w-full h-[55vh] rounded-2xl">
+          <ScrollArea.Viewport className="ScrollAreaViewport">
+            <div className="w-full h-2/3 p-3 rounded-lg bg-slate-500">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                {rooms.map((room: Room) => (
+                  <Card
+                    aria-disabled={room.currentCapacity === room.capacity}
+                    key={room.id}
+                    className="h-full overflow-hidden rounded-lg bg-white p-3 shadow-md hover:bg-slate-200 hover:shadow-lg hover:border-4 hover:border-yellow-500 cursor-pointer transition-all duration-100 ease-in-out"
+                  >
+                    <div
+                      onClick={() => joinRoom(room.id)}
+                      className="flex flex-col items-center justify-center"
+                    >
+                      <div className="w-fit h-fit rounded-full border-4 border-slate-300 shadow-lg p-1">
+                        <Avatar
+                          boxShadow={'lg'}
+                          src={room.illustrationUrl}
+                          size="lg"
+                          className=" w-8 h-8 bg-slate-300"
+                        ></Avatar>
+                      </div>
+
+                      <div className="w-full h-fit flex flex-row justify-center items-center gap-4">
+                        <span className="font-bold text-md">{room.topic}</span>
+                        <span>
+                          {'#'} {room.id}
+                        </span>
+                      </div>
+
+                      <div className="grid grid-cols-3 gap-3 p-3 w-full h-full items-center justify-center content-center font-semibold">
+                        <div
+                          className={`flex flex-1 justify-center items-center ${
+                            room.currentCapacity === room.capacity
+                              ? 'text-red-500'
+                              : 'text-green-500'
+                          }`}
+                        >
+                          <CiUser className="mr-2" size={20} />
+                          {room.currentCapacity}/{room.capacity}
+                        </div>
+                        <div className="flex flex-1 justify-center items-center">
+                          <IoChatbubbleOutline
+                            className="text-blue-500 mr-2"
+                            size={20}
+                          />
+                          EN
+                        </div>
+                        <div className="flex flex-1 justify-center items-center">
+                          <TfiCup className="text-blue-500 mr-2" size={20} />
+                          {100}/{1000}
+                        </div>
+                      </div>
+                    </div>
+                  </Card>
+                ))}
               </div>
-            </Card>
-          ))}
-        </div>
-        <div className="grid grid-cols-2 gap-3 p-3 w-1/2 self-center">
-          <HostDialog user={session.user} router={router} socket={socket} />
+            </div>
+          </ScrollArea.Viewport>
+          <ScrollArea.Scrollbar
+            className="ScrollAreaScrollbar"
+            orientation="vertical"
+          >
+            <ScrollArea.Thumb className="ScrollAreaThumb" />
+          </ScrollArea.Scrollbar>
+          <ScrollArea.Scrollbar
+            className="ScrollAreaScrollbar"
+            orientation="horizontal"
+          >
+            <ScrollArea.Thumb className="ScrollAreaThumb" />
+          </ScrollArea.Scrollbar>
+          <ScrollArea.Corner className="ScrollAreaCorner" />
+        </ScrollArea.Root>
+
+        <div className="h-16 w-full flex flex-row gap-10 justify-center items-center">
+          <HostDialog
+            user={session.user}
+            router={router}
+            socket={socket}
+            setIsLoadingRoom={setIsLoadingRoom}
+          />
 
           <Button
-            className="self-center bg-orange-400 text-white  hover:bg-orange-500"
+            dropShadow={'outline'}
+            bgColor={'yellow.500'}
+            rounded={'xl'}
+            _hover={{
+              boxShadow: 'outline',
+              shadow: 'outline',
+              bgColor: 'yellow.400',
+            }}
+            textColor={'white'}
             onClick={() => {
+              setIsLoadingRoom(true);
               const id = getRandomAvailableRoomId(rooms);
               joinRoom(id);
             }}
           >
-            JOIN RANDOM
+            Join Random
           </Button>
         </div>
       </div>

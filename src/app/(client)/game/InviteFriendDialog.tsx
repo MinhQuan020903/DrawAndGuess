@@ -27,14 +27,32 @@ const InviteFriendDialog = ({
       </Dialog.Trigger>
       <Dialog.Portal>
         <Dialog.Overlay className="DialogOverlay fixed inset-0 bg-black bg-opacity-50 z-40" />
-        <Dialog.Content className="DialogContent fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white p-6 rounded-lg shadow-lg z-50">
-          <Dialog.Title className="DialogTitle">
-            Invite Your Friend
-          </Dialog.Title>
+        <Dialog.Content className="w-[20%] h-[60%] gap-3 fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white p-6 rounded-lg shadow-lg z-50">
+          <div className="w-full h-8 mb-8 flex flex-row justify-between items-center">
+            <Dialog.Title className="DialogTitle">
+              Invite Your Friend
+            </Dialog.Title>
+            <Dialog.Close asChild>
+              <Button
+                dropShadow={'outline'}
+                bgColor={'red.600'}
+                rounded={'xl'}
+                _hover={{
+                  boxShadow: 'outline',
+                  shadow: 'outline',
+                  bgColor: 'red.500',
+                }}
+                size={'sm'}
+                textColor={'white'}
+              >
+                X
+              </Button>
+            </Dialog.Close>
+          </div>
 
-          <div className="w-8 h-8"></div>
+          <div className="w-full h-fit"></div>
           {friends.map((friend, index) => (
-            <div className="w-full h-fit" key={index}>
+            <div className="w-full h-fit my-2" key={index}>
               <InviteFriendToRoom
                 username={username}
                 friendUsername={friend}

@@ -23,7 +23,11 @@ const InviteFriendToRoom = ({
   console.log('🚀 ~ players:', players);
   return (
     <div className="w-full h-full flex flex-row gap-3 justify-between items-center">
-      <div className="w-fit gap-2 flex flex-row items-center">
+      <div
+        className={`w-full gap-2 flex flex-row items-center ${
+          isOnline ? 'text-green-500' : 'text-red-500'
+        }`}
+      >
         <span>{friendUsername}</span>
         <div
           className={`w-2 h-2 rounded-full ${
@@ -38,9 +42,15 @@ const InviteFriendToRoom = ({
       ) ||
         players.length == 1) && (
         <Button
-          bgColor={'white'}
-          size={'sm'}
-          shadow={'sm'}
+          dropShadow={'outline'}
+          bgColor={'blue.600'}
+          rounded={'xl'}
+          _hover={{
+            boxShadow: 'outline',
+            shadow: 'outline',
+            bgColor: 'blue.500',
+          }}
+          textColor={'white'}
           onClick={() => {
             onCloseDialog();
             userSocket.emit('invite-friend-to-room', {

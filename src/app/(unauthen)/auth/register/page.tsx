@@ -5,8 +5,15 @@ const Home = async () => {
   const providers = await getProviders();
   return (
     <div className="dark min-h-screen text-center items-center justify-center flex flex-col text-white">
-      <div className="h-2/5 w-2/5 bg-slate-100">
-        <h1 className="text-2xl text-orange-400">Draw and Guess</h1>
+      <div className="h-2/5 w-2/5 bg-white relative z-10 rounded-lg border-4 shadow-inner gap-4">
+        <div className="flex-wrap w-full text-5xl text-center ">
+          <span className="font-bold flex-wrap ext-5xl text-center text-yellow-400 font-dotGothic16">
+            DRAW AND
+          </span>
+          <span className="font-bold flex-wrap ext-5xl text-center text-blue-500 font-dotGothic16">
+            &nbsp;GUESS
+          </span>
+        </div>
         <Register />
       </div>
     </div>

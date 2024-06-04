@@ -1,13 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import * as Dialog from '@radix-ui/react-dialog';
 import { Cross2Icon } from '@radix-ui/react-icons';
-import { Button, Select } from '@chakra-ui/react';
+import { Button, Select, Spinner } from '@chakra-ui/react';
 import useRoom from '@/hooks/useRoom';
 import Loader from '@/components/Loader';
 import * as RadioGroup from '@radix-ui/react-radio-group';
 import * as z from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import DialogCustom from '@/components/DialogCustom';
 
 interface RoomInputs {
   capacity: number;
@@ -23,7 +24,7 @@ const formSchema = z.object({
   selectedPrivacy: z.enum(['Public', 'Private']),
 });
 
-const HostDialog = ({ user, router, socket }) => {
+const HostDialog = ({ user, router, socket, setIsLoadingRoom }) => {
   const [topics, setTopics] = useState([]);
   const [selectedPrivacy, setSelectedPrivacy] = useState('Public');
 
@@ -71,6 +72,7 @@ const HostDialog = ({ user, router, socket }) => {
         username: user.username,
       });
       socket.on('room-created', (data) => {
+        setIsLoadingRoom(true);
         router.push('/game/' + data);
       });
     }
@@ -79,12 +81,42 @@ const HostDialog = ({ user, router, socket }) => {
     };
   };
 
-  if (!topics) return <Loader />;
+  if (!topics)
+    return (
+      // eslint-disable-next-line react/jsx-no-undef
+      <DialogCustom
+        className="w-[90%] lg:w-[50%] h-fit items-center justify-center rounded-lg"
+        isModalOpen={!topics}
+        notShowClose={true}
+      >
+        <div className="flex flex-col gap-3 items-center justify-center">
+          <Spinner
+            className="w-full h-full flex justify-center items-center"
+            color="cyan"
+          />
+          <div className="text-center font-semibold text-xs sm:text-sm text-cyan-300">
+            Loading
+          </div>
+        </div>
+      </DialogCustom>
+    );
 
   return (
     <Dialog.Root>
       <Dialog.Trigger asChild>
-        <Button className="m-10 bg-blue-500">NEW ROOM</Button>
+        <Button
+          dropShadow={'outline'}
+          bgColor={'blue.600'}
+          rounded={'xl'}
+          _hover={{
+            boxShadow: 'outline',
+            shadow: 'outline',
+            bgColor: 'blue.500',
+          }}
+          textColor={'white'}
+        >
+          Create Room
+        </Button>
       </Dialog.Trigger>
       <Dialog.Portal>
         <Dialog.Overlay className="DialogOverlay fixed inset-0 bg-black bg-opacity-50 z-40" />
@@ -189,7 +221,7 @@ const HostDialog = ({ user, router, socket }) => {
               }}
             >
               <button type="submit" className="Button green">
-                Save changes
+                Create Room
               </button>
             </div>
             <Dialog.Close asChild>

@@ -2,7 +2,6 @@
 
 import * as React from 'react';
 import { cn } from '@/lib/utils';
-import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useForm } from 'react-hook-form';
@@ -20,6 +19,8 @@ import {
 } from '@/components/ui/form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
+import DialogCustom from '@/components/DialogCustom';
+import { Button, Spinner } from '@chakra-ui/react';
 
 const registerSchema = z
   .object({
@@ -81,9 +82,21 @@ const Register = ({ className }) => {
 
   if (isLoading) {
     return (
-      <div className="w-full flex flex-col items-center justify-center">
-        <Loader />
-      </div>
+      <DialogCustom
+        className="w-[90%] lg:w-[50%] h-fit items-center justify-center rounded-lg"
+        isModalOpen={isLoading}
+        notShowClose={true}
+      >
+        <div className="flex flex-col gap-3 items-center justify-center">
+          <Spinner
+            className="w-full h-full flex justify-center items-center"
+            color="cyan"
+          />
+          <div className="text-center font-semibold text-xs sm:text-sm text-blue-300">
+            Loading
+          </div>
+        </div>
+      </DialogCustom>
     );
   }
 
@@ -195,11 +208,25 @@ const Register = ({ className }) => {
                   )}
                 />
               </div>
-              <Button type="submit">Register</Button>
+              <Button
+                shadow={'outline'}
+                dropShadow={'outline'}
+                bgColor={'blue.600'}
+                fontWeight={'bold'}
+                rounded={'xl'}
+                _hover={{
+                  borderColor: 'slate.300',
+                  bgColor: 'blue.500',
+                }}
+                textColor={'white'}
+                type="submit"
+              >
+                Register
+              </Button>
             </div>
           </form>
         </Form>
-        <p className="mt-5 px-8 text-center text-sm text-muted-foreground">
+        <p className="w-full my-4 flex flex-row gap-4 text-center text-sm text-muted-foreground">
           Already have an account?{' '}
           <Link className="font-bold underline text-black" href="/auth/login">
             Login

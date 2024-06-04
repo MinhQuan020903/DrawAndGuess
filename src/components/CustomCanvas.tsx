@@ -213,6 +213,16 @@ const CustomCanvas = (props: CanvasProps) => {
 
   return (
     <canvas
+      style={{
+        cursor: props.isPlaying
+          ? props.isPlayer
+            ? 'crosshair'
+            : 'not-allowed'
+          : 'not-allowed',
+        backgroundColor: '#f0f0f0',
+        boxShadow: '0 0 10px rgba(0, 0, 0, 0.1)',
+        borderRadius: '15px',
+      }}
       ref={canvasRef}
       onContextMenu={(event: MouseEvent) => event.preventDefault()}
       onClick={(event: MouseEvent) => {

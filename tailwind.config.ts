@@ -1,3 +1,4 @@
+import { dotGothic16 } from '@/app/layout';
 import { nextui } from '@nextui-org/react';
 import type { Config } from 'tailwindcss';
 
@@ -12,6 +13,8 @@ const config: Config = {
     extend: {
       fontFamily: {
         mont: ['var(--font-mont)'],
+        inter: ['var(--font-inter)'],
+        dotGothic16: ['var(--font-dotgothic16)'],
       },
       colors: {
         border: '#e4e4e7',

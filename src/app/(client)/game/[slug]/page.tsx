@@ -7,7 +7,6 @@ import { Slider } from '@/components/ui/slider';
 import PlayHeader from '@/components/headers/playHeader';
 import LeaderBoardComponent from '@/components/leaderboard/LeaderBoardComponent';
 import { getSession } from 'next-auth/react';
-import Loader from '@/components/Loader';
 import { io } from 'socket.io-client';
 import Chat from '../Chat';
 import { ToastContainer, toast } from 'react-toastify';
@@ -15,6 +14,8 @@ import 'react-toastify/dist/ReactToastify.css';
 import Timer from '../Timer';
 import { Player } from '@/types/types';
 import InviteFriendDialog from '../InviteFriendDialog';
+import DialogCustom from '@/components/DialogCustom';
+import { Button, Spinner } from '@chakra-ui/react';
 
 export default function Page({ params }: { params: { slug: string } }) {
   const [color, setColor] = useState('#000000'); // Brush color
@@ -250,11 +251,27 @@ export default function Page({ params }: { params: { slug: string } }) {
   };
 
   if (loading || !socket || !session) {
-    return <Loader />;
+    return (
+      <DialogCustom
+        className="w-[90%] lg:w-[50%] h-fit items-center justify-center rounded-lg"
+        isModalOpen={loading || !socket || !session}
+        notShowClose={true}
+      >
+        <div className="flex flex-col gap-3 items-center justify-center">
+          <Spinner
+            className="w-full h-full flex justify-center items-center"
+            color="cyan"
+          />
+          <div className="text-center font-semibold text-xs sm:text-sm text-blue-300">
+            Loading
+          </div>
+        </div>
+      </DialogCustom>
+    );
   }
 
   return (
-    <div className="flex flex-col gap-4 min-h-screen text-white p-24">
+    <div className="flex flex-col gap-4 min-h-screen text-white p-16">
       <ToastContainer />
       <PlayHeader socket={socket} user={session?.user} roomId={params.slug} />
       {/* Body */}
@@ -267,8 +284,8 @@ export default function Page({ params }: { params: { slug: string } }) {
             setPlayers={setPlayers}
           />
         </div>
-        <div className="w-[75%] flex flex-row rounded-md gap-3 justify-between">
-          <div className="flex flex-col gap-3">
+        <div className="w-[100%] lg:w-[80%] flex flex-row rounded-md gap-3 justify-between">
+          <div className="flex flex-col gap-3 justify-between items-end">
             <CustomCanvas
               fillMode={fillMode}
               brushSize={brushSize}
@@ -280,8 +297,10 @@ export default function Page({ params }: { params: { slug: string } }) {
               socket={socket}
               isPlayer={isPlayer}
               isPlaying={isPlaying}
-              className={`${isPlaying ? 'h-[90%]' : 'h-full'} w-full bg-white`}
-            ></CustomCanvas>
+              className={`${
+                isPlaying ? 'h-[90%]' : 'h-full'
+              } w-[80%] lg:w-full bg-white `}
+            />
             <div className="w-full h-[10%]">
               {isPlaying && (
                 <Timer
@@ -386,15 +405,22 @@ export default function Page({ params }: { params: { slug: string } }) {
                   isOnline={true}
                   userSocket={userSocket}
                 ></InviteFriendDialog>
-                <button
+                <Button
+                  shadow={'inner'}
+                  bgColor={'yellow.400'}
+                  fontWeight={'bold'}
+                  rounded={'xl'}
+                  size={'lg'}
+                  _hover={{
+                    bgColor: 'yellow.500',
+                  }}
+                  textColor={'white'}
                   onClick={() => {
                     startGame();
                   }}
                 >
-                  <div className="color-square w-16 h-16 p-2 rounded-lg border-1 bg-yellow-400 border-white items-center justify-center flex">
-                    Play
-                  </div>
-                </button>
+                  Play
+                </Button>
               </div>
             )}
           </div>

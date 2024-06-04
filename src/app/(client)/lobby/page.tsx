@@ -6,7 +6,8 @@ import { getSession } from '@/lib/auth';
 import Loader from '@/components/Loader';
 import HostDialog from './HostDialog';
 import { useRouter } from 'next/navigation';
-import { Avatar } from '@chakra-ui/react';
+import { Avatar, Spinner } from '@chakra-ui/react';
+import DialogCustom from '@/components/DialogCustom';
 
 const Page: FC = () => {
   const [session, setSession] = useState<any>(null);
@@ -25,30 +26,45 @@ const Page: FC = () => {
   }, []);
 
   if (loading) {
-    return <Loader />;
+    return (
+      <DialogCustom
+        className="w-[90%] lg:w-[50%] h-fit items-center justify-center rounded-lg"
+        isModalOpen={loading}
+        notShowClose={true}
+      >
+        <div className="flex flex-col gap-3 items-center justify-center">
+          <Spinner
+            className="w-full h-full flex justify-center items-center"
+            color="cyan"
+          />
+          <div className="text-center font-semibold text-xs sm:text-sm text-blue-300">
+            Loading
+          </div>
+        </div>
+      </DialogCustom>
+    );
   }
 
   return (
-    <div className="relative min-h-screen text-center items-center justify-center flex flex-col text-white">
-      <div className="flex flex-row w-4/5 justify-between space-x-52 ">
+    <div className="relative min-h-screen text-center items-center justify-center flex flex-col text-white gap-3 py-2">
+      <div className="flex flex-row w-4/5 justify-between space-x-52 gap-3">
         <div className="flex flex-1"></div>
-        <div className="flex flex-1  w-full flex-row gap-8 justify-center items-center content-center ">
-          <div className="font-bold flex-wrap text-xl text-center text-orange-300">
+        <div className="flex flex-1  w-full flex-row gap-8 justify-center items-center content-center font-dotGothic16">
+          <div className="font-bold flex-wrap text-xl text-center text-yellow-300">
             DRAW AND GUESS
           </div>
         </div>
         <div className="flex flex-1 self-end w-full flex-row justify-center items-center content-center ">
           <div className="flex justify-end items-center w-2/3">
-            <div className="font-bold text-xl w-full h-full text-center">
+            <div className="font-bold text-xl w-full h-full text-center font-dotGothic16">
               {session?.user.username}
             </div>
           </div>
-          <div className="w-18 h-18 items-center  border rounded-full bg-slate-100">
+          <div className="w-18 h-18 items-center border rounded-full bg-white">
             <Avatar
-              mr={2}
               src={`https://api.dicebear.com/5.x/big-smile/svg?seed=Lee`}
               size="lg"
-              className=" w-8 h-8 bg-slate-300"
+              className="flex justify-center items-center p-1"
             ></Avatar>
           </div>
         </div>

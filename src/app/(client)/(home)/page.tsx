@@ -3,9 +3,10 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { getSession } from '@/lib/auth';
-import { Button } from '@chakra-ui/react';
+import { Button, Input, Spinner } from '@chakra-ui/react';
 import { signOut } from 'next-auth/react';
 import { Avatar } from '@chakra-ui/react';
+import DialogCustom from '@/components/DialogCustom';
 
 const HomePage = () => {
   const [session, setSession] = useState(null);
@@ -44,58 +45,120 @@ const HomePage = () => {
   };
 
   if (loading) {
-    return <div>Loading...</div>;
+    return (
+      <DialogCustom
+        className="w-[90%] lg:w-[50%] h-fit items-center justify-center rounded-lg"
+        isModalOpen={loading}
+        notShowClose={true}
+      >
+        <div className="flex flex-col gap-3 items-center justify-center">
+          <Spinner
+            className="w-full h-full flex justify-center items-center"
+            color="cyan"
+          />
+          <div className="text-center font-semibold text-xs sm:text-sm text-cyan-300">
+            Loading
+          </div>
+        </div>
+      </DialogCustom>
+    );
   }
 
   return (
-    <div className="relative min-h-screen text-center items-center justify-center flex flex-col text-white">
-      <div className="flex flex-row w-2/5 justify-between space-x-52 ">
-        <div className="flex flex-1  w-full flex-row gap-8 justify-center items-center content-center ">
-          <div className="font-bold flex-wrap text-xl text-center text-orange-300">
-            DRAW AND GUESS
+    <div className="relative min-h-screen text-center items-center justify-center flex flex-col text-white gap-5 bg-transparent">
+      <div className="flex flex-col w-2/5 justify-between space-x-52">
+        <div className="w-full flex flex-row gap-8 justify-center items-center ">
+          <div className="flex-wrap w-full text-5xl text-center ">
+            <span className="font-bold flex-wrap ext-5xl text-center text-yellow-400 font-dotGothic16">
+              DRAW AND
+            </span>
+            <span className="font-bold flex-wrap ext-5xl text-center text-blue-500 font-dotGothic16">
+              &nbsp;GUESS
+            </span>
           </div>
         </div>
-        <div className="flex flex-1 self-end w-full flex-row justify-center items-center content-center ">
-          <div className="flex justify-end items-center w-2/3">
-            <div className="font-bold text-xl w-full h-full text-center">
-              {session?.user.username}
-            </div>
-          </div>
-          <div className="w-18 h-18 items-center  border rounded-full bg-slate-100">
+        <div className="flex flex-1 self-end w-full flex-row justify-center items-center font-dotGothic16 gap-3">
+          <div className="w-18 h-18 items-center border rounded-full bg-white">
             <Avatar
-              mr={2}
               src={`https://api.dicebear.com/5.x/big-smile/svg?seed=Lee`}
               size="lg"
-              className=" w-8 h-8 bg-slate-300"
+              className="flex justify-center items-center p-1"
             ></Avatar>
+          </div>
+          <div className="w-full font-bold text-2xl h-full text-left text-blue-500">
+            Welcome, {session?.user.username}!
           </div>
         </div>
       </div>
-      <div className="h-2/5 w-2/5 bg-slate-300 relative z-10">
-        <div>
-          <div className="flex flex-col gap-10 p-10">
-            <Button className="m-5 bg-orange-200" onClick={handlePublic}>
-              Public
-            </Button>
-            <div className=" m-5 flex flex-row gap-10 p-10">
-              <Button className=" w-2/5 bg-orange-200" onClick={handlePrivate}>
-                Private
-              </Button>
-              <input
-                className=" bg-orange-200 w-2/5"
-                type="text"
-                placeholder="Enter room code"
-                value={roomCode}
-                onChange={(e) => setRoomCode(e.target.value)}
-              />
-            </div>
+      <div className="h-2/5 w-2/5 px-8 py-12 bg-white relative z-10 rounded-lg border-4  shadow-inner">
+        <div className="flex flex-col gap-20">
+          <Button
+            shadow={'outline'}
+            dropShadow={'outline'}
+            bgColor={'blue.600'}
+            fontWeight={'bold'}
+            rounded={'xl'}
+            _hover={{
+              borderColor: 'slate.300',
+              bgColor: 'blue.500',
+            }}
+            textColor={'white'}
+            onClick={handlePublic}
+          >
+            Public
+          </Button>
+          <div className="w-full flex flex-row gap-10 justify-between">
             <Button
-              onClick={() => signOut({ callbackUrl: '/' })}
-              className="border-solid border-t-2 mt-2  gap-2"
+              shadow={'outline'}
+              dropShadow={'outline'}
+              borderColor={'white'}
+              bgColor={'blue.600'}
+              fontWeight={'bold'}
+              rounded={'xl'}
+              _hover={{
+                borderColor: 'slate.300',
+                bgColor: 'blue.500',
+              }}
+              textColor={'white'}
+              className=" w-2/5 bg-orange-200"
+              onClick={handlePrivate}
             >
-              Đăng xuất
+              Private
             </Button>
+            <Input
+              shadow={'outline'}
+              dropShadow={'outline'}
+              bgColor={'blue.600'}
+              fontWeight={'bold'}
+              rounded={'xl'}
+              _hover={{
+                borderColor: 'slate.300',
+                bgColor: 'blue.500',
+              }}
+              _placeholder={{ color: 'white' }}
+              textColor={'white'}
+              className=" bg-orange-200 w-3/5 text-white"
+              type="text"
+              placeholder="Enter room code"
+              value={roomCode}
+              onChange={(e) => setRoomCode(e.target.value)}
+            />
           </div>
+          <Button
+            shadow={'initial'}
+            border={'4px'}
+            bgColor={'red.400'}
+            fontWeight={'bold'}
+            rounded={'xl'}
+            _hover={{
+              bgColor: 'red.500',
+            }}
+            textColor={'white'}
+            onClick={() => signOut({ callbackUrl: '/' })}
+            className="border-solid border-t-2 mt-2  gap-2"
+          >
+            Sign Out
+          </Button>
         </div>
       </div>
     </div>
