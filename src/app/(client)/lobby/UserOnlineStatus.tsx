@@ -21,9 +21,16 @@ const UserOnlineStatusCard = ({
       </div>
       {!isFriend && (
         <Button
-          bgColor={'white'}
+          dropShadow={'outline'}
+          bgColor={'green.300'}
+          rounded={'xl'}
+          _hover={{
+            boxShadow: 'outline',
+            shadow: 'outline',
+            bgColor: 'green.400',
+          }}
           size={'sm'}
-          shadow={'sm'}
+          textColor={'white'}
           onClick={() => {
             userSocket.emit('send-friend-request', {
               sender: user.username,

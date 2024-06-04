@@ -128,15 +128,13 @@ const HomePage = () => {
             <Input
               shadow={'outline'}
               dropShadow={'outline'}
-              bgColor={'blue.600'}
               fontWeight={'bold'}
               rounded={'xl'}
               _hover={{
-                borderColor: 'slate.300',
-                bgColor: 'blue.500',
+                borderColor: 'black',
               }}
-              _placeholder={{ color: 'white' }}
-              textColor={'white'}
+              _placeholder={{ color: 'gray' }}
+              textColor={'black'}
               className=" bg-orange-200 w-3/5 text-white"
               type="text"
               placeholder="Enter room code"

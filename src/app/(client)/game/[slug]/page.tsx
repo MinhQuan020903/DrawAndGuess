@@ -33,7 +33,7 @@ export default function Page({ params }: { params: { slug: string } }) {
   const [isPlayer, setIsPlayer] = useState(false); // Player status [player or not player]
   const [newGame, setNewGame] = useState(true); // New game [true or false]
 
-  const totalTimer = 15000;
+  const totalTimer = 20000;
   const [timer, setTimer] = useState(totalTimer); // Timer [15 seconds]
   const [players, setPlayers] = useState<Player[]>([]);
 
@@ -141,7 +141,9 @@ export default function Page({ params }: { params: { slug: string } }) {
       socket.on('keyword', (data: any) => {
         console.log('Keyword Received', data);
         setKeyword(data.message);
-        toast.info('You are the drawer! The keyword is: ' + data.message);
+        toast.info('You are the drawer! The keyword is: ' + data.message, {
+          autoClose: 5000,
+        });
       });
 
       socket.on('player-disconnect', (data) => {
@@ -186,9 +188,13 @@ export default function Page({ params }: { params: { slug: string } }) {
     userSocket.on('response-invite-friend-to-room', (data) => {
       console.log('response-invite-friend-to-room', data);
       if (data.accept && data.sender == session.user.username) {
-        toast.success(data.receiver + ' accepted your invitation');
+        toast.success(data.receiver + ' accepted your invitation', {
+          autoClose: 2000,
+        });
       } else if (!data.accept && data.sender == session.user.username) {
-        toast.error(data.receiver + ' rejected your invitation');
+        toast.error(data.receiver + ' rejected your invitation', {
+          autoClose: 2000,
+        });
       }
     });
   }, [userSocket, session]);
@@ -246,7 +252,6 @@ export default function Page({ params }: { params: { slug: string } }) {
       toast.error('You need at least 2 players to start the game!');
       return;
     }
-    console.log('Starting game..fsdafsdfaf.');
     socket.emit('start-game', { roomId: params.slug, newGame: newGame });
   };
 
@@ -272,7 +277,7 @@ export default function Page({ params }: { params: { slug: string } }) {
 
   return (
     <div className="flex flex-col gap-4 min-h-screen text-white p-16">
-      <ToastContainer />
+      <ToastContainer hideProgressBar={true} autoClose={3000} />
       <PlayHeader socket={socket} user={session?.user} roomId={params.slug} />
       {/* Body */}
       <div className="flex flex-row grow gap-4">
@@ -333,10 +338,13 @@ export default function Page({ params }: { params: { slug: string } }) {
       <div className="flex flex-row grow gap-4">
         <div className="basis-1/4 flex "></div>
         <div className="basis-3/4 flex flex-col ">
-          <div className="flex flex-row grow gap-2 justify-center items-center">
+          <div className="flex flex-row gap-2 justify-center items-center">
             {isPlayer && (
-              <div className="flex flex-row grow gap-2 justify-center items-center">
-                <div>{keyword}</div>
+              <div className="flex flex-row gap-2 items-center justify-center">
+                <div className="flex flex-row gap-3 justify-center items-center bg-blue-500 rounded-md shadow-lg p-3">
+                  <span>Keyword:</span>
+                  <span className="font-bold text-lg">{keyword}</span>
+                </div>
                 {Object.entries(colors).map(([key, value], index) => (
                   <button
                     key={key}

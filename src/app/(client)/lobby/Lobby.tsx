@@ -61,6 +61,9 @@ const Lobby = ({ session }) => {
 
     // refetchData();
   }, [debouncedSearch]);
+  const navigateToRoom = (roomId: string) => {
+    router.push(`/game/${roomId}`);
+  };
   const joinRoom = useCallback(
     (roomId: string) => {
       if (socket) {
@@ -145,35 +148,57 @@ const Lobby = ({ session }) => {
       newUserSocket.on('invite-friend-to-room', (data) => {
         if (data.receiver == session.user.username) {
           toast.info(
-            <div className="w-full h-full flex flex-row justify-evenly">
-              <span>
+            <div className="flex flex-row justify-evenly gap-3">
+              <span className="w-[70%] font-semibold">
                 {data.sender} invited you to join room {data.roomId}
               </span>
-              <Button
-                onClick={() => {
-                  newUserSocket.emit('response-invite-friend-to-room', {
-                    sender: data.sender,
-                    receiver: data.receiver,
-                    roomId: data.roomId,
-                    accept: true,
-                  });
-                  router.push(`/game/${data.roomId}`);
-                }}
-              >
-                Accept
-              </Button>
-              <Button
-                onClick={() => {
-                  newUserSocket.emit('response-invite-friend-to-room', {
-                    sender: data.sender,
-                    receiver: data.receiver,
-                    roomId: data.roomId,
-                    accept: false,
-                  });
-                }}
-              >
-                Reject
-              </Button>
+              <div className="w-[30%] flex flex-col gap-3">
+                <Button
+                  dropShadow={'outline'}
+                  bgColor={'green.300'}
+                  rounded={'xl'}
+                  size={'sm'}
+                  _hover={{
+                    boxShadow: 'outline',
+                    shadow: 'outline',
+                    bgColor: 'green.500',
+                  }}
+                  textColor={'white'}
+                  onClick={() => {
+                    newUserSocket.emit('response-invite-friend-to-room', {
+                      sender: data.sender,
+                      receiver: data.receiver,
+                      roomId: data.roomId,
+                      accept: true,
+                    });
+                    router.push(`/game/${data.roomId}`);
+                  }}
+                >
+                  Accept
+                </Button>
+                <Button
+                  dropShadow={'outline'}
+                  bgColor={'red.400'}
+                  rounded={'xl'}
+                  size={'sm'}
+                  _hover={{
+                    boxShadow: 'outline',
+                    shadow: 'outline',
+                    bgColor: 'red.500',
+                  }}
+                  textColor={'white'}
+                  onClick={() => {
+                    newUserSocket.emit('response-invite-friend-to-room', {
+                      sender: data.sender,
+                      receiver: data.receiver,
+                      roomId: data.roomId,
+                      accept: false,
+                    });
+                  }}
+                >
+                  Reject
+                </Button>
+              </div>
             </div>,
             {
               position: 'bottom-right',
@@ -270,9 +295,15 @@ const Lobby = ({ session }) => {
                   shadow={'sm'}
                   value={searchQuery || ''}
                   onChange={(event) => setSearchQuery(event.target.value)}
+                  onKeyDown={(event) => {
+                    if (event.key === 'Enter') {
+                      event.preventDefault(); // Prevent form submission
+                      navigateToRoom(searchQuery);
+                    }
+                  }}
                   className="h-full px-5 w-2/3 sm:px-5 flex-1 text-zinc-800 bg-zinc-100 focus:bg-white rounded-full focus:outline-none focus:ring-[1px] focus:ring-black placeholder:text-zinc-400"
                   placeholder="Search room..."
-                ></Input>
+                />
               </InputGroup>
             </form>
           </div>
@@ -314,7 +345,7 @@ const Lobby = ({ session }) => {
                         </span>
                       </div>
 
-                      <div className="grid grid-cols-3 gap-3 p-3 w-full h-full items-center justify-center content-center font-semibold">
+                      <div className="grid grid-cols-2 gap-3 p-3 w-full h-full items-center justify-center content-center font-semibold">
                         <div
                           className={`flex flex-1 justify-center items-center ${
                             room.currentCapacity === room.capacity
@@ -332,10 +363,10 @@ const Lobby = ({ session }) => {
                           />
                           EN
                         </div>
-                        <div className="flex flex-1 justify-center items-center">
+                        {/* <div className="flex flex-1 justify-center items-center">
                           <TfiCup className="text-blue-500 mr-2" size={20} />
-                          {100}/{1000}
-                        </div>
+                          {100}/{}
+                        </div> */}
                       </div>
                     </div>
                   </Card>

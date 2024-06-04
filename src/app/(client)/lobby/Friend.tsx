@@ -7,7 +7,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from '@/components/ui/sheet';
-import { Button } from '@chakra-ui/react';
+import { Button, Input, InputGroup, InputLeftElement } from '@chakra-ui/react';
 import { Separator } from '@/components/ui/separator';
 import {
   Accordion,
@@ -19,9 +19,12 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import UserOnlineStatusCard from './UserOnlineStatus';
 import FriendRequestCard from './FriendRequestCard';
 import { FiUsers } from 'react-icons/fi';
+import { FaSearch } from 'react-icons/fa';
 
 const Friend = ({ userSocket, user }) => {
+  const [searchQuery, setSearchQuery] = useState('');
   const [users, setUsers] = useState([]);
+
   const [friendRequests, setFriendRequests] = useState([]);
   const [friends, setFriends] = useState([]);
 
@@ -29,11 +32,9 @@ const Friend = ({ userSocket, user }) => {
     if (!userSocket) return;
 
     userSocket.on('new-user', () => {
-      userSocket.emit('get-users', { username: user.username });
+      userSocket.emit('get-users', { keyword: '', username: user.username });
       userSocket.emit('get-friends', { username: user.username });
     });
-
-    // userSocket.emit('get-users', { username: user.username });
 
     userSocket.on('users', (data) => {
       console.log('users', data);
@@ -58,12 +59,14 @@ const Friend = ({ userSocket, user }) => {
       console.log('🚀 ~ userSocket.on ~ friendRequest:', friendRequests);
     });
     userSocket.on('friend-request-response', (data) => {
-      if (data.accept) {
-        if (data.sender == user.username || data.receiver == user.username) {
-          userSocket.emit('get-users', { username: user.username });
-          userSocket.emit('get-friends', { username: user.username });
-          userSocket.emit('get-friend-requests', { username: user.username });
-        }
+      console.log('🚀 ~ userSocket.on friend-request-response ~ data:', data);
+      if (data.sender == user.username || data.receiver == user.username) {
+        userSocket.emit('get-users', {
+          keyword: '',
+          username: user.username,
+        });
+        userSocket.emit('get-friends', { username: user.username });
+        userSocket.emit('get-friend-requests', { username: user.username });
       }
     });
 
@@ -73,7 +76,7 @@ const Friend = ({ userSocket, user }) => {
     });
 
     userSocket.on('user-disconnected', () => {
-      userSocket.emit('get-users', { username: user.username });
+      userSocket.emit('get-users', { keyword: '', username: user.username });
       userSocket.emit('get-friends', { username: user.username });
     });
 
@@ -86,6 +89,13 @@ const Friend = ({ userSocket, user }) => {
       userSocket.off('user-disconnected');
     };
   }, [userSocket]);
+
+  const searchUsers = (username) => {
+    userSocket.emit('get-users', {
+      keyword: username,
+      username: user.username,
+    });
+  };
 
   return (
     <div className="flex flex-1 w-full flex-row justify-center items-center content-center ">
@@ -116,6 +126,35 @@ const Friend = ({ userSocket, user }) => {
             </SheetHeader>
             <Separator />
             <ScrollArea className="my-2 h-[calc(100vh-8rem)] pb-10 pl-6 pr-5">
+              <InputGroup>
+                <InputLeftElement
+                  h="100%"
+                  pointerEvents="none"
+                  display="flex"
+                  alignItems="center"
+                  justifyContent="center"
+                >
+                  <FaSearch color="gray" />
+                </InputLeftElement>
+                <Input
+                  size={'lg'}
+                  shadow={'sm'}
+                  value={searchQuery || ''}
+                  onChange={(event) => {
+                    setSearchQuery(event.target.value);
+                    searchUsers(event.target.value);
+                  }}
+                  onKeyDown={(event) => {
+                    if (event.key === 'Enter') {
+                      event.preventDefault(); // Prevent form submission
+                      searchUsers(searchQuery);
+                      setSearchQuery('');
+                    }
+                  }}
+                  className="h-full px-5 w-2/3 sm:px-5 flex-1 text-zinc-800 bg-zinc-100 focus:bg-white rounded-full focus:outline-none focus:ring-[1px] focus:ring-black placeholder:text-zinc-400"
+                  placeholder="Search user..."
+                />
+              </InputGroup>
               <div className="space-y-4">
                 <Accordion
                   type="multiple"
@@ -127,26 +166,24 @@ const Friend = ({ userSocket, user }) => {
                     </AccordionTrigger>
                     <AccordionContent>
                       <div className="w-full flex flex-col gap-2">
-                        {users.length > 0 ? (
-                          users.map((u, index) => {
-                            if (user.username != u && u != '') {
-                              return (
-                                <div key={index}>
-                                  <UserOnlineStatusCard
-                                    username={u}
-                                    isOnline={true}
-                                    user={user}
-                                    isFriend={false}
-                                    userSocket={userSocket}
-                                  />
-                                </div>
-                              );
-                            }
-                            return null;
-                          })
-                        ) : (
-                          <p>No users online</p>
-                        )}
+                        {users.length > 0
+                          ? users.map((u, index) => {
+                              if (user.username != u && u != '') {
+                                return (
+                                  <div key={index}>
+                                    <UserOnlineStatusCard
+                                      username={u}
+                                      isOnline={true}
+                                      user={user}
+                                      isFriend={false}
+                                      userSocket={userSocket}
+                                    />
+                                  </div>
+                                );
+                              }
+                              return null;
+                            })
+                          : null}
                       </div>
                     </AccordionContent>
                   </AccordionItem>

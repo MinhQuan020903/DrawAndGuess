@@ -50,8 +50,13 @@ const Page: FC = () => {
       <div className="flex flex-row w-4/5 justify-between space-x-52 gap-3">
         <div className="flex flex-1"></div>
         <div className="flex flex-1  w-full flex-row gap-8 justify-center items-center content-center font-dotGothic16">
-          <div className="font-bold flex-wrap text-xl text-center text-yellow-300">
-            DRAW AND GUESS
+          <div className="flex-wrap w-full text-xl text-center ">
+            <span className="font-bold flex-wrap text-center text-yellow-400 font-dotGothic16">
+              DRAW AND
+            </span>
+            <span className="font-bold flex-wrap text-center text-blue-500 font-dotGothic16">
+              &nbsp;GUESS
+            </span>
           </div>
         </div>
         <div className="flex flex-1 self-end w-full flex-row justify-center items-center content-center ">

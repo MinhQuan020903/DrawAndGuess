@@ -9,10 +9,16 @@ const FriendRequestCard = ({ username, user, userSocket }) => {
       <span>{username}</span>
       <div className="w-fit gap-2 flex flex-row items-center">
         <Button
-          bgColor={'white'}
+          dropShadow={'outline'}
+          bgColor={'blue.600'}
+          rounded={'xl'}
           size={'sm'}
-          shadow={'sm'}
-          color={'green'}
+          _hover={{
+            boxShadow: 'outline',
+            shadow: 'outline',
+            bgColor: 'blue.500',
+          }}
+          textColor={'white'}
           onClick={() => {
             userSocket.emit('response-friend-request', {
               receiver: user.username,
@@ -24,9 +30,16 @@ const FriendRequestCard = ({ username, user, userSocket }) => {
           <FaCheck />
         </Button>
         <Button
-          bgColor={'white'}
+          dropShadow={'outline'}
+          bgColor={'red.600'}
+          rounded={'xl'}
           size={'sm'}
-          shadow={'sm'}
+          _hover={{
+            boxShadow: 'outline',
+            shadow: 'outline',
+            bgColor: 'red.500',
+          }}
+          textColor={'white'}
           onClick={() => {
             userSocket.emit('response-friend-request', {
               receiver: user.username,
