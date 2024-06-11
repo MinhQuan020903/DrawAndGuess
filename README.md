@@ -1,36 +1,144 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+<div align="center">
+  <img src="./images/logo.png" alt="Next.js" style="height:100px;"/>
+</div>
 
-## Getting Started
+---
 
-First, run the development server:
+<div align="center">
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+## 🎨🖼 Draw and guess the words as fast as you can! 🤔✏
+
+</div>
+
+<br/>
+
+![Web Preview](./images/game.png)
+
+---
+
+## Tech Stack
+
+<p align="center">
+  <img src="./images/nextjs_logo.png" alt="Next.js" width="100" height="100"/>&nbsp;&nbsp;&nbsp;
+  <img src="./images/springboot_logo.png" alt="Flask" width="100" height="100"/>&nbsp;&nbsp;&nbsp;
+  <img src="./images/websocket_logo.png" alt="Supabase" width="100" height="100"/>
+</p>
+
+---
+
+## Features
+
+- Draw and guess with funny little topics.
+- Join or create your own rooms with different customizations.
+- Add and invite your friends to play with you!
+
+---
+
+## Installation
+
+Clone the frontend branch from Github
+
+```sh
+git clone https://github.com/MinhQuan020903/melodia-music-player.git
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Install packages:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```sh
+npm install
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+Run the application:
 
-## Learn More
+```sh
+nnpm run dev
+```
 
-To learn more about Next.js, take a look at the following resources:
+Clone the backend branch from Github
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```sh
+git clone https://github.com/MinhQuan020903/DrawAndGuess_Server.git
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+Install Maven dependencies:
 
-## Deploy on Vercel
+```sh
+mvn install
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Run the application:
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+```sh
+mvn spring-boot:run
+```
+
+---
+
+# Sites
+
+### Menu
+
+![](./images/menu.png)
+
+### Lobby
+
+![](./images/lobby.png)
+
+### Game
+
+![](./images/game.png)
+
+---
+
+## Contributors
+
+<table align="center">
+  <tr>
+  <td align="center">
+        <a href="https://github.com/MinhQuan020903">
+            <img src="https://avatars.githubusercontent.com/u/91861930?v=4" width="100px;"/>
+            <br />
+            <sub>
+                <b>Do Mai Minh Quan</b>
+            </sub>
+        </a>
+        <br />
+        </a> 
+    </td>
+    <td align="center">
+        <a href="https://github.com/TinSpaghettiCode">
+            <img src="https://avatars.githubusercontent.com/u/105272877?v=4" width="100px;"/>
+            <br />
+            <sub>
+                <b>Nguyen Ngoc Tin</b>
+            </sub>
+        </a>
+        <br />
+        </a> 
+    </td>
+
+  <td align="center">
+        <a href="https://github.com/Ninhnon">
+            <img src="https://avatars.githubusercontent.com/u/100849901?v=4" width="100px;"/>
+            <br />
+            <sub>
+                <b>Nguyen Trong Ninh</b>
+            </sub>
+        </a>
+        <br />
+        </a> 
+    </td>
+    <td align="center">
+        <a href="https://github.com/petrichor-hl">
+            <img src="https://avatars.githubusercontent.com/u/100850610?v=4" width="100px;"/>
+            <br />
+            <sub>
+                <b>Tran Le Hoang Lam</b>
+            </sub>
+        </a>
+        <br />
+        </a> 
+    </td>
+
+  </tr>
+</table>

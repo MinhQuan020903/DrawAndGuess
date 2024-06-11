@@ -15,6 +15,7 @@ import Timer from '../Timer';
 import { Player } from '@/types/types';
 import InviteFriendDialog from '../InviteFriendDialog';
 import DialogCustom from '@/components/DialogCustom';
+import { PiHandsClapping } from 'react-icons/pi';
 import { Button, Spinner } from '@chakra-ui/react';
 
 export default function Page({ params }: { params: { slug: string } }) {
@@ -141,9 +142,15 @@ export default function Page({ params }: { params: { slug: string } }) {
       socket.on('keyword', (data: any) => {
         console.log('Keyword Received', data);
         setKeyword(data.message);
-        toast.info('You are the drawer! The keyword is: ' + data.message, {
-          autoClose: 5000,
-        });
+        toast.info(
+          <div className="w-full space-x-1">
+            <span>You are the drawer! The keyword is:</span>
+            <span className="font-bold text-blue-400">{data.message}</span>
+          </div>,
+          {
+            autoClose: 5000,
+          }
+        );
       });
 
       socket.on('player-disconnect', (data) => {
@@ -232,9 +239,18 @@ export default function Page({ params }: { params: { slug: string } }) {
     socket.on('found-winner', (data) => {
       console.log('🚀 ~ socket.on found-winner~ data:', data);
       if (data.id == session?.user?.id) {
-        toast.success('Congratulations, you are the winner!');
+        toast.success('Congratulations, you are the winner!', {
+          icon: <PiHandsClapping color="yellow" />,
+        });
       } else {
-        toast.info('Game Ended, The winner is: ' + data.detail.username);
+        toast.info(
+          <div className="w-full space-x-1">
+            <span>Game over! The winner is:</span>
+            <span className="font-bold text-blue-400">
+              {data.detail.username}
+            </span>
+          </div>
+        );
       }
       setNewGame(true);
     });
@@ -340,9 +356,8 @@ export default function Page({ params }: { params: { slug: string } }) {
         <div className="basis-3/4 flex flex-col ">
           <div className="flex flex-row gap-2 justify-center items-center">
             {isPlayer && (
-              <div className="flex flex-row gap-2 items-center justify-center">
-                <div className="flex flex-row gap-3 justify-center items-center bg-blue-500 rounded-md shadow-lg p-3">
-                  <span>Keyword:</span>
+              <div className="w-full flex flex-row gap-2 items-center justify-center">
+                <div className="w-fit flex space-x-1 bg-blue-500 rounded-md shadow-lg p-3 text-center">
                   <span className="font-bold text-lg">{keyword}</span>
                 </div>
                 {Object.entries(colors).map(([key, value], index) => (

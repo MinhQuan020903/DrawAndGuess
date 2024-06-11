@@ -41,8 +41,8 @@ const Login = ({ className }: { className?: string; providers: unknown }) => {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      username: 'minh_quan',
-      password: 'quan2003',
+      username: '',
+      password: '',
     },
   });
   async function onSubmit(data) {
@@ -109,7 +109,7 @@ const Login = ({ className }: { className?: string; providers: unknown }) => {
                         render={({ field }) => (
                           <FormItem>
                             <FormControl className="border-black border-2">
-                              <Input placeholder="minh_quan" {...field} />
+                              <Input placeholder="username" {...field} />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -145,7 +145,7 @@ const Login = ({ className }: { className?: string; providers: unknown }) => {
                                 value={field.value}
                                 onChange={field.onChange}
                                 id="password"
-                                placeholder="quan2003"
+                                placeholder="password"
                                 type={show.showPass ? 'text' : 'password'}
                                 autoCapitalize="none"
                                 autoComplete="password"
