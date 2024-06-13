@@ -1,0 +1,104 @@
+{
+  "lobbies": [
+    {
+      "id": "lobby0",
+      "name": "Lobby 0",
+      "host": {
+        "id": "user1",
+        "username": "Player1",
+        "avatar": "host_avatar.png"
+      },
+      "players": [
+        {
+          "id": "user1",
+          "username": "Player1",
+          "avatar": "host_avatar.png",
+          "status": "ready"
+        },
+        {
+          "id": "user2",
+          "username": "HostPlayer1",
+          "avatar": "player_avatar.png",
+          "status": "not_ready"
+        },
+        {
+          "id": "user3",
+          "username": "AnotherHost2",
+          "avatar": "another_host_avatar.png",
+          "status": "ready"
+        }
+      ],
+      "settings": {
+        "maxPlayers": 13,
+        "privacy": "private",
+        "gameMode": "deathmatch",
+        "map": "City",
+        "startTime": "2024-06-13T18:58:32.463081Z"
+      },
+      "chat": [
+        {
+          "userId": "user2",
+          "username": "HostPlayer1",
+          "message": "Let's go!",
+          "timestamp": "2024-06-13T18:23:32.463081Z"
+        }
+      ]
+    },
+    {
+      "id": "lobby1",
+      "name": "Lobby 1",
+      "host": {
+        "id": "user11",
+        "username": "Player0",
+        "avatar": "host_avatar.png"
+      },
+      "players": [
+        {
+          "id": "user11",
+          "username": "Player0",
+          "avatar": "host_avatar.png",
+          "status": "ready"
+        },
+        {
+          "id": "user12",
+          "username": "HostPlayer1",
+          "avatar": "another_host_avatar.png",
+          "status": "ready"
+        },
+        {
+          "id": "user13",
+          "username": "HostPlayer2",
+          "avatar": "another_host_avatar.png",
+          "status": "ready"
+        },
+        {
+          "id": "user14",
+          "username": "Player3",
+          "avatar": "player_avatar.png",
+          "status": "ready"
+        }
+      ],
+      "settings": {
+        "maxPlayers": 16,
+        "privacy": "public",
+        "gameMode": "team_deathmatch",
+        "map": "Desert",
+        "startTime": "2024-06-13T18:58:32.464006Z"
+      },
+      "chat": [
+        {
+          "userId": "user12",
+          "username": "HostPlayer1",
+          "message": "Hello everyone!",
+          "timestamp": "2024-06-13T18:24:32.464006Z"
+        },
+        {
+          "userId": "user14",
+          "username": "Player3",
+          "message": "Let's go!",
+          "timestamp": "2024-06-13T18:38:32.464006Z"
+        }
+      ]
+    }
+  ]
+}
